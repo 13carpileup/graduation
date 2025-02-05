@@ -2,7 +2,7 @@ use std::fs;
 use std::path::Path;
 
 pub async fn get_all_names() -> Vec<(String, String)> {
-    let file_path = "src/data/names.txt";
+    let file_path = "data/names.txt";
 
     let contents = fs::read_to_string(file_path)
         .expect("Should have been able to read the file");
@@ -21,7 +21,7 @@ pub async fn get_all_names() -> Vec<(String, String)> {
 }
 
 pub async fn get_timetable(id: u64) -> String {
-    let file_path = format!("src/data/{id}.txt");
+    let file_path = format!("data/{id}.txt");
 
     if !Path::new(&file_path).exists() {
         return "Does not exist".to_string();
