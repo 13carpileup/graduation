@@ -29,5 +29,4 @@ coverage
 
 *.tsbuildinfo
 
-data
 scraper/speaker.py

@@ -10,6 +10,11 @@ const classData = ref([])
 const errorMessage = ref('')
 const isLoading = ref(false)
 const showSuggestions = ref(false)
+const sharedClassesData = ref<[string, number][]>([])
+
+type SharedClassData = [string, number]; // Tuple type: [name, count]
+
+const baseURL = "https://graduation-util.shuttle.app/"
 
 const searchNames = async () => {
   if (searchQuery.value.length < 2) {
@@ -18,7 +23,7 @@ const searchNames = async () => {
   }
   
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/prefix/${searchQuery.value}`)
+    const response = await axios.get(baseURL + `prefix/${searchQuery.value}`)
     searchResults.value = response.data
   } catch (error) {
     console.error('Failed to fetch suggestions:', error)
@@ -31,6 +36,7 @@ const selectStudent = (name: string, id: string) => {
   selectedId.value = id
   showSuggestions.value = false
   fetchData()
+  fetchSharedClasses()
 }
 
 const fetchData = async () => {
@@ -41,13 +47,28 @@ const fetchData = async () => {
   showSuggestions.value = false
 
   try {
-    const response = await axios.get(`http://localhost:8000/get_data/${selectedId.value}`)
+    const response = await axios.get(baseURL + `get_data/${selectedId.value}`)
     classData.value = response.data
   } catch (error) {
     errorMessage.value = 'Failed to fetch data. Please try again.'
     console.error(error)
   } finally {
     isLoading.value = false
+  }
+}
+
+const fetchSharedClasses = async () => {
+  if (!selectedId.value) return
+  
+  try {
+    const response = await axios.get(baseURL + `shared_classes/${selectedId.value}`)
+    sharedClassesData.value = response.data
+    sharedClassesData.value.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+
+  } catch (error) {
+    console.error('Failed to fetch shared classes:', error)
   }
 }
 
@@ -136,6 +157,22 @@ const getProgressColor = (classesLeft: number) => {
               <span :class="['remaining-number', getProgressColor(item[1])]">
                 {{ item[1] }} classes left
               </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shared Classes Visualization -->
+        <div v-if="sharedClassesData.length > 0" class="shared-classes-container">
+          <h2 class="shared-classes-title">Who will you be spending that time with?</h2>
+          <div class="shared-classes-grid">
+            <div
+              v-for="[name, count] in sharedClassesData"
+              :key="name"
+              class="shared-class-bar"
+              :style="{ width: `${Math.max((count / Math.max(...sharedClassesData.map(([_, c]) => c))) * 97, 20)}%` }"
+            >
+              <span class="shared-class-name">{{ name }}</span>
+              <span class="shared-class-count">{{ count }} classes</span>
             </div>
           </div>
         </div>
@@ -503,6 +540,59 @@ const getProgressColor = (classesLeft: number) => {
 /* Add a subtle border when suggestions are shown */
 .search-wrapper:focus-within {
   border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.shared-classes-container {
+  margin-top: 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.shared-classes-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.shared-classes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.shared-class-bar {
+  background: linear-gradient(to right, #ff9f43, #ff7f50);
+  color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 150px;
+  transition: width 0.3s ease;
+}
+
+.shared-class-name {
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.shared-class-count {
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .shared-classes-container {
+    padding: 1rem;
+  }
+  
+  .shared-class-bar {
+    width: 100% !important;
+  }
 }
 </style>
 
