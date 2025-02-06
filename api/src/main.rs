@@ -2,8 +2,8 @@ use axum::{
     extract::Path,
     routing::get, 
     Json, 
-    Router
 };
+use shuttle_axum::axum::Router; // Import Router from shuttle_axum::axum
 use serde::Deserialize;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
@@ -79,7 +79,7 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .allow_headers(Any)
         .allow_credentials(false);
 
-    let router: axum::Router = Router::new()
+    let router: Router = Router::new()
         .route("/", get(hello_world))
         .route("/get_all_names", get(get_all_names))
         .route("/get_data/:uuid", get(get_timetable_data))
