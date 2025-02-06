@@ -18,6 +18,12 @@ mod counter;
 mod countdown;
 
 async fn hello_world() -> &'static str {
+    println!("HELLO WORLD!");
+
+    if let Err(e) = print_files_in_root_dir().await {
+        eprintln!("Failed to read root directory: {}", e);
+    }
+
     "Hello world!"
 }
 
@@ -80,6 +86,9 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .allow_headers(Any)
         .allow_credentials(false);
 
+
+    println!("ELLO!!");
+
     if let Err(e) = print_files_in_root_dir().await {
         eprintln!("Failed to read root directory: {}", e);
     }
@@ -92,6 +101,7 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/shared_classes/{uuid}", get(shared_classes))
         .route("/countdowns", get(countdowns))
         .layer(cors);
+
 
     Ok(router.into())
 }   
