@@ -10,7 +10,8 @@ use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer}; 
 use http::{Method, HeaderValue};
 use tower_http::cors::AllowOrigin;
-
+use tokio::fs;
+use std::io;
 
 mod file;
 mod counter;
@@ -79,14 +80,31 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .allow_headers(Any)
         .allow_credentials(false);
 
-    let router: Router = Router::new()
+    if let Err(e) = print_files_in_root_dir().await {
+        eprintln!("Failed to read root directory: {}", e);
+    }
+
+    let router = Router::new()
         .route("/", get(hello_world))
         .route("/get_all_names", get(get_all_names))
-        .route("/get_data/:uuid", get(get_timetable_data))
-        .route("/prefix/:search", get(prefix_search))
-        .route("/shared_classes/:uuid", get(shared_classes))
+        .route("/get_data/{uuid}", get(get_timetable_data))
+        .route("/prefix/{search}", get(prefix_search))
+        .route("/shared_classes/{uuid}", get(shared_classes))
         .route("/countdowns", get(countdowns))
         .layer(cors);
 
-        Ok(router.into())
-    }   
+    Ok(router.into())
+}   
+
+
+async fn print_files_in_root_dir() -> io::Result<()> {
+    let mut entries = fs::read_dir(".").await?;
+
+    while let Some(entry) = entries.next_entry().await? {
+        let path = entry.path();
+        println!("File: {}", path.display());
+        
+    }
+
+    Ok(())
+}
