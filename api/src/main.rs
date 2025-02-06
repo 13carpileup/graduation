@@ -9,6 +9,8 @@ use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer}; 
 use http::{Method, HeaderValue};
+use tower_http::cors::AllowOrigin;
+
 
 mod file;
 mod counter;
@@ -64,12 +66,19 @@ async fn shared_classes(Path(Params { uuid }): Path<Params>) -> Json<Vec<(String
 
 #[shuttle_runtime::main]
 pub async fn main() -> shuttle_axum::ShuttleAxum {
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_headers(Any)
+        .allow_credentials(false);
+
     let router: axum::Router = Router::new()
         .route("/", get(hello_world))
         .route("/get_all_names", get(get_all_names))
-        .route("/get_data/{uuid}", get(get_timetable_data))
-        .route("/prefix/{search}", get(prefix_search))
-        .route("/shared_classes/{uuid}", get(shared_classes));
+        .route("/get_data/:uuid", get(get_timetable_data))
+        .route("/prefix/:search", get(prefix_search))
+        .route("/shared_classes/:uuid", get(shared_classes))
+        .layer(cors);
 
         Ok(router.into())
     }   
