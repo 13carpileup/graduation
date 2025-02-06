@@ -1,13 +1,13 @@
 use axum::{
     extract::Path,
-    routing::get, 
-    Json, 
+    routing::get,
+    Json,
 };
 use shuttle_axum::axum::Router; // Import Router from shuttle_axum::axum
 use serde::Deserialize;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
-use tower_http::cors::{Any, CorsLayer}; 
+use tower_http::cors::{Any, CorsLayer};
 use http::{Method, HeaderValue};
 use tower_http::cors::AllowOrigin;
 use tokio::fs;
@@ -17,15 +17,14 @@ mod file;
 mod counter;
 mod countdown;
 
-async fn hello_world() -> &'static str {
-    println!("HELLO WORLD!");
 
-    if let Err(e) = print_files_in_root_dir().await {
-        eprintln!("Failed to read root directory: {}", e);
-    }
+async fn hello_world() -> Json<Vec<String>> {
+    let mut files = print_files_in_root_dir().await;
 
-    "Hello world!"
+    Json(files)
 }
+
+
 
 async fn get_all_names() -> Json<Vec<(String, String)>> {
     let res = file::get_all_names().await;
@@ -89,9 +88,6 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
 
     println!("ELLO!!");
 
-    if let Err(e) = print_files_in_root_dir().await {
-        eprintln!("Failed to read root directory: {}", e);
-    }
 
     let router = Router::new()
         .route("/", get(hello_world))
@@ -107,14 +103,16 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
 }   
 
 
-async fn print_files_in_root_dir() -> io::Result<()> {
-    let mut entries = fs::read_dir(".").await?;
+async fn print_files_in_root_dir() -> Vec<String> {
+    let mut files = vec![];
+    let mut entries = fs::read_dir("./data").await.unwrap();
 
-    while let Some(entry) = entries.next_entry().await? {
+    while let Some(entry) = entries.next_entry().await.unwrap() {
         let path = entry.path();
         println!("File: {}", path.display());
+        files.push(path.display().to_string());
         
     }
 
-    Ok(())
+    files
 }
