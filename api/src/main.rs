@@ -14,6 +14,7 @@ use tower_http::cors::AllowOrigin;
 
 mod file;
 mod counter;
+mod countdown;
 
 async fn hello_world() -> &'static str {
     "Hello world!"
@@ -64,6 +65,12 @@ async fn shared_classes(Path(Params { uuid }): Path<Params>) -> Json<Vec<(String
     Json(counter::shared_classes(uuid).await)
 }
 
+async fn countdowns() -> Json<Vec<(String, String)>> {
+    let countdowns = countdown::countdowns();
+
+    Json(countdowns)
+}
+
 #[shuttle_runtime::main]
 pub async fn main() -> shuttle_axum::ShuttleAxum {
     let cors = CorsLayer::new()
@@ -78,6 +85,7 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/get_data/:uuid", get(get_timetable_data))
         .route("/prefix/:search", get(prefix_search))
         .route("/shared_classes/:uuid", get(shared_classes))
+        .route("/countdowns", get(countdowns))
         .layer(cors);
 
         Ok(router.into())
