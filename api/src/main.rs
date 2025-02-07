@@ -79,12 +79,12 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .allow_headers(Any)
         .allow_credentials(false);
 
-    let router: Router = Router::new()
+    let router = Router::new()
         .route("/", get(hello_world))
         .route("/get_all_names", get(get_all_names))
-        .route("/get_data/:uuid", get(get_timetable_data))
-        .route("/prefix/:search", get(prefix_search))
-        .route("/shared_classes/:uuid", get(shared_classes))
+        .route("/get_data/{uuid}", get(get_timetable_data))
+        .route("/prefix/{search}", get(prefix_search))
+        .route("/shared_classes/{uuid}", get(shared_classes))
         .route("/countdowns", get(countdowns))
         .layer(cors);
 
