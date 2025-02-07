@@ -72,77 +72,71 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="container">
-    <h1>Countdown Timers</h1>
+  <div class="app">
+    <div class="container">
+      <div v-if="error" class="error">
+        {{ error }}
+      </div>
 
-    <div v-if="error" class="error">
-      {{ error }}
-    </div>
+      <div v-else-if="countdowns.length === 0" class="loading">
+        Loading countdowns...
+      </div>
 
-    <div v-else-if="countdowns.length === 0" class="loading">
-      Loading countdowns...
-    </div>
-
-    <div v-else class="countdown-grid">
-      <div v-for="countdown in countdowns" :key="countdown.title" class="countdown-card">
-        <h2>{{ countdown.title }}</h2>
-        
-        <div class="time-grid">
-          <div class="time-block">
-            <div class="time-value">{{ countdown.remaining.days }}</div>
-            <div class="time-label">Days</div>
-          </div>
+      <div v-else class="countdown-grid">
+        <div v-for="countdown in countdowns" :key="countdown.title" class="countdown-card">
+          <h2>{{ countdown.title }}</h2>
           
-          <div class="time-block">
-            <div class="time-value">{{ countdown.remaining.hours }}</div>
-            <div class="time-label">Hours</div>
+          <div class="time-grid">
+            <div class="time-block">
+              <div class="time-value">{{ countdown.remaining.days }}</div>
+              <div class="time-label">days</div>
+            </div>
+            
+            <div class="time-block">
+              <div class="time-value">{{ countdown.remaining.hours }}</div>
+              <div class="time-label">hours</div>
+            </div>
+            
+            <div class="time-block">
+              <div class="time-value">{{ countdown.remaining.minutes }}</div>
+              <div class="time-label">minutes</div>
+            </div>
+            
+            <div class="time-block">
+              <div class="time-value">{{ countdown.remaining.seconds }}</div>
+              <div class="time-label">seconds</div>
+            </div>
           </div>
-          
-          <div class="time-block">
-            <div class="time-value">{{ countdown.remaining.minutes }}</div>
-            <div class="time-label">Minutes</div>
-          </div>
-          
-          <div class="time-block">
-            <div class="time-value">{{ countdown.remaining.seconds }}</div>
-            <div class="time-label">Seconds</div>
-          </div>
-        </div>
 
-        <div class="target-date">
-          Target: {{ new Date(countdown.date).toLocaleString() }}
+          <div class="target-date">
+            {{ new Date(countdown.date).toLocaleString() }}
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+</style>
+
 <style scoped>
+.app {
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
 .container {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-h1 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
-}
-
-.error {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 15px;
-  border-radius: 4px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.loading {
-  text-align: center;
-  color: #666;
+  padding: 0 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .countdown-grid {
@@ -151,105 +145,74 @@ h1 {
 }
 
 .countdown-card {
-  background-color: #fff;
+  background-color: #ffffff;
+  padding: 24px;
   border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.countdown-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .countdown-card h2 {
-  margin: 0 0 20px 0;
+  margin: 0 0 24px 0;
   color: #333;
-  font-size: 1.5em;
+  font-size: 1.4em;
+  font-weight: 500;
 }
 
 .time-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .time-block {
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  padding: 10px;
   text-align: center;
 }
 
 .time-value {
-  font-size: 1.8em;
-  font-weight: bold;
+  font-size: 2em;
+  font-weight: 500;
   color: #333;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .time-label {
-  font-size: 0.9em;
+  font-size: 0.85em;
   color: #666;
 }
 
 .target-date {
-  text-align: center;
+  text-align: right;
   color: #666;
   font-size: 0.9em;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
-/* Responsive design */
+.error {
+  color: #e53935;
+  text-align: center;
+  padding: 16px;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+}
+
 @media (max-width: 600px) {
   .container {
-    padding: 10px;
-  }
-
-  .time-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .time-value {
-    font-size: 1.5em;
-  }
-
-  .time-label {
-    font-size: 0.8em;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #1a1a1a;
+    padding: 0 16px;
   }
 
   .countdown-card {
-    background-color: #2d2d2d;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 16px;
   }
 
-  .countdown-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  .time-grid {
+    gap: 12px;
   }
 
-  h1, .countdown-card h2, .time-value {
-    color: #fff;
-  }
-
-  .time-block {
-    background-color: #3d3d3d;
-  }
-
-  .time-label, .target-date {
-    color: #aaa;
-  }
-
-  .loading {
-    color: #aaa;
+  .time-value {
+    font-size: 1.6em;
   }
 }
 </style>
