@@ -14,7 +14,7 @@ const sharedClassesData = ref<[string, number][]>([])
 
 type SharedClassData = [string, number]; // Tuple type: [name, count]
 
-const baseURL = "http://143.198.112.247:8000/"
+const baseURL = "https://wiki.alexclimie.com/"
 
 const searchNames = async () => {
   if (searchQuery.value.length < 2) {
