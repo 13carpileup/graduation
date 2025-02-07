@@ -106,7 +106,7 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
 
 async fn print_files_in_root_dir() -> Vec<String> {
     let mut files = vec![env::current_dir().unwrap().into_os_string().into_string().unwrap()];
-    let mut entries = fs::read_dir(".").await.unwrap();
+    let mut entries = fs::read_dir("data").await.unwrap();
 
     while let Some(entry) = entries.next_entry().await.unwrap() {
         let path = entry.path();
