@@ -1,4 +1,6 @@
 # Declare ignored files that should be included in deployment:
+name = "graduation"
+
 [build]
 include = [
   "data/*"

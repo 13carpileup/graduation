@@ -101,8 +101,7 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
 
 
     Ok(router.into())
-}   
-
+} 
 
 async fn print_files_in_root_dir() -> Vec<String> {
     let mut files = vec![];
