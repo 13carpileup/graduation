@@ -3,3 +3,8 @@
 include = [
   "data/*"
 ]
+
+[deploy]
+include = [
+  "data/*",
+]

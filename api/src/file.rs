@@ -1,8 +1,10 @@
 use std::fs;
 use std::path::Path;
+use std::env;
 
 pub async fn get_all_names() -> Vec<(String, String)> {
-    let file_path = "data/names.txt";
+    let project_root = env::var("PROJECT_ROOT").expect("PROJECT_ROOT environment variable not set");
+    let file_path = format!("{}/data/names.txt", project_root);
 
     let contents = fs::read_to_string(file_path)
         .expect("Should have been able to read the file");
@@ -21,7 +23,8 @@ pub async fn get_all_names() -> Vec<(String, String)> {
 }
 
 pub async fn get_timetable(id: u64) -> String {
-    let file_path = format!("data/{id}.txt");
+    let project_root = env::var("PROJECT_ROOT").expect("PROJECT_ROOT environment variable not set");
+    let file_path = format!("{}/data/{}.txt", project_root, id);
 
     if !Path::new(&file_path).exists() {
         return "Does not exist".to_string();

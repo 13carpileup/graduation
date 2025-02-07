@@ -105,14 +105,24 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
 
 
 async fn print_files_in_root_dir() -> Vec<String> {
-    let mut files = vec![env::current_dir().unwrap().into_os_string().into_string().unwrap()];
-    let mut entries = fs::read_dir("data").await.unwrap();
+    let mut files = vec![];
 
-    while let Some(entry) = entries.next_entry().await.unwrap() {
-        let path = entry.path();
-        println!("File: {}", path.display());
-        files.push(path.display().to_string());
-        
+    let root_dir = "."; 
+
+    let current_dir = env::current_dir().unwrap();
+    println!("Current directory: {}", current_dir.display());
+
+    match fs::read_dir(root_dir).await {
+        Ok(mut entries) => {
+            while let Ok(Some(entry)) = entries.next_entry().await {
+                let path = entry.path();
+                println!("File: {}", path.display());
+                files.push(path.display().to_string());
+            }
+        }
+        Err(e) => {
+            println!("Error reading directory: {}", e);
+        }
     }
 
     files
