@@ -1,7 +1,5 @@
 use std::collections::HashMap;
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
-use tokio::process;
-
+use chrono::{NaiveDate, Utc};
 
 fn check_date(uuid: &str) -> bool {
     let day = uuid[6..8].to_string().parse::<u32>().unwrap(); 

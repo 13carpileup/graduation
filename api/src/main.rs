@@ -5,11 +5,8 @@ use axum::{
 };
 use shuttle_axum::axum::Router; // Import Router from shuttle_axum::axum
 use serde::Deserialize;
-use std::net::SocketAddr;
-use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer}; 
-use http::{Method, HeaderValue};
-use tower_http::cors::AllowOrigin;
+use http::Method;
 
 
 mod file;
