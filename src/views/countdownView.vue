@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { TimerIcon } from 'lucide-vue-next'
 
 interface CountdownItem {
   title: string
@@ -52,7 +51,6 @@ const fetchCountdowns = async () => {
       remaining: calculateTimeRemaining(date)
     }))
     
-    // Start the interval only if we have countdowns
     if (countdowns.value.length > 0 && !intervalId) {
       intervalId = setInterval(updateCountdowns, 1000)
     }
@@ -74,66 +72,45 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 py-8 px-4">
-    <div class="max-w-3xl mx-auto">
-      <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
-        <TimerIcon class="inline-block mr-2 mb-1" />
-        Countdown Timers
-      </h1>
+  <div class="container">
+    <h1>Countdown Timers</h1>
 
-      <div v-if="error" class="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
-        {{ error }}
-      </div>
+    <div v-if="error" class="error">
+      {{ error }}
+    </div>
 
-      <div v-else-if="countdowns.length === 0" class="text-center text-gray-500">
-        Loading countdowns...
-      </div>
+    <div v-else-if="countdowns.length === 0" class="loading">
+      Loading countdowns...
+    </div>
 
-      <div v-else class="grid gap-6">
-        <div
-          v-for="countdown in countdowns"
-          :key="countdown.title"
-          class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300"
-        >
-          <div class="p-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">
-              {{ countdown.title }}
-            </h2>
-            
-            <div class="grid grid-cols-4 gap-4 text-center">
-              <div class="bg-gray-50 rounded-lg p-3">
-                <div class="text-2xl font-bold text-gray-800">
-                  {{ countdown.remaining.days }}
-                </div>
-                <div class="text-sm text-gray-500">Days</div>
-              </div>
-              
-              <div class="bg-gray-50 rounded-lg p-3">
-                <div class="text-2xl font-bold text-gray-800">
-                  {{ countdown.remaining.hours }}
-                </div>
-                <div class="text-sm text-gray-500">Hours</div>
-              </div>
-              
-              <div class="bg-gray-50 rounded-lg p-3">
-                <div class="text-2xl font-bold text-gray-800">
-                  {{ countdown.remaining.minutes }}
-                </div>
-                <div class="text-sm text-gray-500">Minutes</div>
-              </div>
-              
-              <div class="bg-gray-50 rounded-lg p-3">
-                <div class="text-2xl font-bold text-gray-800">
-                  {{ countdown.remaining.seconds }}
-                </div>
-                <div class="text-sm text-gray-500">Seconds</div>
-              </div>
-            </div>
-
-            <div class="mt-4 text-sm text-gray-500 text-center">
-              Target: {{ new Date(countdown.date).toLocaleString() }}
-            </div>
+    <div v-else class="countdown-grid">
+      <div v-for="countdown in countdowns" :key="countdown.title" class="countdown-card">
+        <h2>{{ countdown.title }}</h2>
+        
+        <div class="time-grid">
+          <div class="time-block">
+            <div class="time-value">{{ countdown.remaining.days }}</div>
+            <div class="time-label">Days</div>
           </div>
+          
+          <div class="time-block">
+            <div class="time-value">{{ countdown.remaining.hours }}</div>
+            <div class="time-label">Hours</div>
+          </div>
+          
+          <div class="time-block">
+            <div class="time-value">{{ countdown.remaining.minutes }}</div>
+            <div class="time-label">Minutes</div>
+          </div>
+          
+          <div class="time-block">
+            <div class="time-value">{{ countdown.remaining.seconds }}</div>
+            <div class="time-label">Seconds</div>
+          </div>
+        </div>
+
+        <div class="target-date">
+          Target: {{ new Date(countdown.date).toLocaleString() }}
         </div>
       </div>
     </div>
@@ -141,12 +118,138 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
 }
 
-.countdown-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+}
+
+.countdown-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.countdown-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.countdown-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.countdown-card h2 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.time-block {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+}
+
+.time-value {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.time-label {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.target-date {
+  text-align: center;
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 15px;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  .time-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .time-value {
+    font-size: 1.5em;
+  }
+
+  .time-label {
+    font-size: 0.8em;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+  }
+
+  .countdown-card {
+    background-color: #2d2d2d;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .countdown-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  h1, .countdown-card h2, .time-value {
+    color: #fff;
+  }
+
+  .time-block {
+    background-color: #3d3d3d;
+  }
+
+  .time-label, .target-date {
+    color: #aaa;
+  }
+
+  .loading {
+    color: #aaa;
+  }
 }
 </style>
