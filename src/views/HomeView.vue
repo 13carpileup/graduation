@@ -66,6 +66,7 @@ const fetchSharedClasses = async () => {
     sharedClassesData.value.sort(function(a, b) {
       return b[1] - a[1];
     });
+    sharedClassesData.value = sharedClassesData.value.slice(0, 15); 
 
   } catch (error) {
     console.error('Failed to fetch shared classes:', error)

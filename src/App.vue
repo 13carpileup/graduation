@@ -9,6 +9,9 @@ import { RouterLink, RouterView } from 'vue-router'
         <RouterLink to="/" class="nav-link">
           Graduation Tracker
         </RouterLink>
+        <RouterLink to="/countdown" class="nav-link">
+          Countdown
+        </RouterLink>
       </nav>
     </div>
   </header>
@@ -32,11 +35,12 @@ import { RouterLink, RouterView } from 'vue-router'
 .nav-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   height: 4rem;
 }
 
 .nav-link {
+  margin: 3rem;
+  float:left;
   font-size: 1.125rem;
   font-weight: 600;
   background: linear-gradient(to right, #7c3aed, #4f46e5);
