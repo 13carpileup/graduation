@@ -1,5 +1,5 @@
 # Declare ignored files that should be included in deployment:
-[deploy]
+[build]
 include = [
   "data/*"
 ]
