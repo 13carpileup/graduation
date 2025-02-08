@@ -215,6 +215,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
   font-size: 2.5rem;
   font-weight: bold;
   background: linear-gradient(to right, #7c3aed, #4f46e5);
+  -webkit-background-clip: text;
   color: transparent;
   margin-bottom: 1rem;
 }
