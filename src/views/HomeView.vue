@@ -31,9 +31,11 @@ const searchNames = async () => {
   }
 }
 
-const selectStudent = (name: string, id: string) => {
+const selectStudent = (name: any, id: any) => {
   searchQuery.value = name
   selectedId.value = id
+  localStorage.setItem("selected", id)
+  localStorage.setItem("name", name)
   showSuggestions.value = false
   fetchData()
   fetchSharedClasses()
@@ -81,6 +83,10 @@ const getProgressColor = (classesLeft: number) => {
   if (classesLeft <= 2) return 'progress-success'
   if (classesLeft <= 4) return 'progress-warning'
   return 'progress-default'
+}
+
+if (localStorage.getItem("selected") && localStorage.getItem("name")) {
+  selectStudent(localStorage.getItem("name"), localStorage.getItem("selected"));
 }
 </script>
 
@@ -209,7 +215,6 @@ const getProgressColor = (classesLeft: number) => {
   font-size: 2.5rem;
   font-weight: bold;
   background: linear-gradient(to right, #7c3aed, #4f46e5);
-  -webkit-background-clip: text;
   color: transparent;
   margin-bottom: 1rem;
 }
