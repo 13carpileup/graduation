@@ -172,15 +172,16 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
         <div v-if="sharedClassesData.length > 0" class="shared-classes-container">
           <h2 class="shared-classes-title">Who will you be spending that time with?</h2>
           <div class="shared-classes-grid">
-            <div
+            <button
               v-for="[name, count] in sharedClassesData"
               :key="name"
               class="shared-class-bar"
               :style="{ width: `${Math.max((count / Math.max(...sharedClassesData.map(([_, c]) => c))) * 97, 20)}%` }"
+              @click="selectStudent(name[0], name[1])"
             >
-              <span class="shared-class-name">{{ name }}</span>
+              <span class="shared-class-name">{{ name[0] }}</span>
               <span class="shared-class-count">{{ count }} classes</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
