@@ -59,7 +59,7 @@ async fn prefix_search(Path(PrefixParams { search }): Path<PrefixParams>) -> Jso
     Json(matches)
 }
 
-async fn shared_classes(Path(Params { uuid }): Path<Params>) -> Json<Vec<(String, u64)>> {
+async fn shared_classes(Path(Params { uuid }): Path<Params>) -> Json<Vec<((String, u64), u64)>> {
     Json(counter::shared_classes(uuid).await)
 }
 

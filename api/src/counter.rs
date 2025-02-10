@@ -53,8 +53,8 @@ pub fn process_data(timetable: String) -> Vec<(String, u64)> {
     return out;
 }
 
-pub async fn shared_classes(uuid: u64) -> Vec<(String, u64)> {
-    let mut out: Vec<(String, u64)> = vec![];
+pub async fn shared_classes(uuid: u64) -> Vec<((String, u64), u64)> {
+    let mut out: Vec<((String, u64), u64)> = vec![];
 
     let raw_data = super::file::get_timetable(uuid).await;
     let processed_data = process_data(raw_data);
@@ -80,7 +80,7 @@ pub async fn shared_classes(uuid: u64) -> Vec<(String, u64)> {
             }
         }
 
-        out.push((student.0, total_classes));
+        out.push(((student.0, new_uuid), total_classes));
     }
     
     out
