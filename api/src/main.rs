@@ -13,6 +13,7 @@ mod file;
 mod counter;
 mod countdown;
 mod log;
+mod connections;
 
 async fn hello_world() -> &'static str {
     "Hello world!"
@@ -69,6 +70,24 @@ async fn countdowns() -> Json<Vec<(String, String)>> {
     Json(countdowns)
 }
 
+async fn get_connections() -> Json<Vec<(((String, u64), (String, u64)), u64)>> {
+    let resp = connections::get_connections().await;
+    
+    Json(resp)
+}
+
+#[derive(Deserialize)]
+struct MultiParams {
+    uuid1: u64,
+    uuid2: u64
+}
+
+async fn update_connections(Path(MultiParams { uuid1, uuid2 }): Path<MultiParams>) -> Json<String> {
+    println!("{uuid1} and {uuid2}");
+    
+    Json("lol".to_string())
+}
+
 #[shuttle_runtime::main]
 pub async fn main() -> shuttle_axum::ShuttleAxum {
     let cors = CorsLayer::new()
@@ -84,6 +103,8 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/prefix/{search}", get(prefix_search))
         .route("/shared_classes/{uuid}", get(shared_classes))
         .route("/countdowns", get(countdowns))
+        .route("/get_connections", get(get_connections))
+        .route("/update_connections/{uuid1}/{uuid2}", get(update_connections))
         .layer(cors);
 
         Ok(router.into())
