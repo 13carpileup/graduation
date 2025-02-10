@@ -12,6 +12,7 @@ use http::Method;
 mod file;
 mod counter;
 mod countdown;
+mod log;
 
 async fn hello_world() -> &'static str {
     "Hello world!"

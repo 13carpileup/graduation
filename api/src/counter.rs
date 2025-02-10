@@ -63,7 +63,7 @@ pub async fn shared_classes(uuid: u64) -> Vec<(String, u64)> {
     for student in all_students {
         let new_uuid = student.1.parse::<u64>().unwrap();
         if new_uuid == uuid {
-            println!("Fetching {name}", name = student.0);
+            let _ = super::log::write_to_file(student.0).await;
             continue;
         }
 
