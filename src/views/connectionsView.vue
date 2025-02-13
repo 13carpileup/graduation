@@ -22,7 +22,7 @@ onMounted(() => {
 
 <template>
   <div class = "app">
-
+    work in progress...
   </div>
 </template>
 
