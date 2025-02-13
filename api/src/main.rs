@@ -70,22 +70,33 @@ async fn countdowns() -> Json<Vec<(String, String)>> {
     Json(countdowns)
 }
 
-async fn get_connections() -> Json<Vec<(((String, u64), (String, u64)), u64)>> {
-    let resp = connections::get_connections().await;
+async fn get_connections() -> Json<Vec<((String, String), u64)>> {
+    let resp = connections::get_connections().await.unwrap();
     
     Json(resp)
 }
 
 #[derive(Deserialize)]
 struct MultiParams {
-    uuid1: u64,
-    uuid2: u64
+    uuid1: String,
+    uuid2: String,
+    delta: i64,
 }
 
-async fn update_connections(Path(MultiParams { uuid1, uuid2 }): Path<MultiParams>) -> Json<String> {
+async fn update_connections(Path(MultiParams { uuid1, uuid2, delta }): Path<MultiParams>) -> Json<String> {
     println!("{uuid1} and {uuid2}");
+
+    if delta != 1 && delta != -1 {
+        log::write_to_file(format!("Direct delta writing attempt for users {uuid1} and {uuid2}")).await;
+        return Json("Invalid delta".to_string());
+    }
     
-    Json("lol".to_sting())
+    let resp = connections::update_connection(uuid1, uuid2, delta).await;
+
+    match resp {
+        Ok(_e) => return  Json("Success".to_string()),
+        Err(v) => return Json(v.to_string())
+    };
 }
 
 #[shuttle_runtime::main]
@@ -104,7 +115,7 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/shared_classes/{uuid}", get(shared_classes))
         .route("/countdowns", get(countdowns))
         .route("/get_connections", get(get_connections))
-        .route("/update_connections/{uuid1}/{uuid2}", get(update_connections))
+        .route("/update_connections/{uuid1}/{uuid2}/{delta}", get(update_connections))
         .layer(cors);
 
         Ok(router.into())

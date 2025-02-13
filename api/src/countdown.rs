@@ -1,5 +1,6 @@
 pub fn countdowns() -> Vec<(String, String)> {
     let cds: Vec<(&str, &str)> = vec![
+        ("Orals", "2025-03-11 8:00"),
         ("Last day of school", "2025-04-03 15:20"),
         ("Physics Paper 1", "2025-04-29 13:00"),
         ("SEHS Papers 1 & 3", "2025-04-29 13:00"), 

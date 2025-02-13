@@ -79,7 +79,7 @@ async fn init_database() -> Result<(), sqlx::Error> {
     Ok(())
 }
 
-pub async fn get_connections() -> Result<Vec<((u64, u64), u64)>, sqlx::Error> {
+pub async fn get_connections() -> Result<Vec<((String, String), u64)>, sqlx::Error> {
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect("postgres://postgres:postgres@localhost/grad")
@@ -113,7 +113,7 @@ pub async fn get_connections() -> Result<Vec<((u64, u64), u64)>, sqlx::Error> {
         let primary_key = formatted["connection"].clone();
         let ids: Vec<&str> = primary_key.split('-').collect();
 
-        let new_entry = ((ids[0].parse::<u64>().unwrap(), ids[1].parse::<u64>().unwrap()), formatted["weight"].clone().parse::<u64>().unwrap());
+        let new_entry = ((ids[0].to_string(), ids[1].to_string()), formatted["weight"].clone().parse::<u64>().unwrap());
         
         out.push(new_entry);
     }
@@ -121,7 +121,7 @@ pub async fn get_connections() -> Result<Vec<((u64, u64), u64)>, sqlx::Error> {
     Ok(out)
 }
 
-pub async fn update_connection(id1: u64, id2: u64, delta: i64) -> Result<(), sqlx::Error> {
+pub async fn update_connection(id1: String, id2: String, delta: i64) -> Result<(), sqlx::Error> {
     let pool = PgPoolOptions::new()
     .max_connections(5)
     .connect("postgres://postgres:postgres@localhost/grad")

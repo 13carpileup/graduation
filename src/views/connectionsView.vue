@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { API_BASE_URL } from '@/constants'
+const idmap = new Map()
 
 const error = ref<string | null>(null)
+const searchResults = ref<[[string, string], number][]>([])
 
 
-const fetchCountdowns = async () => {
+const fetchNames = async () => {
   try {
-    const response = await fetch('https://127.0.0.1/get_connections')
+    const response = await fetch(API_BASE_URL + '/get_all_names')
     const data = await response.json()
+
+    for (let i = 0; i < data.length; i++) {
+      idmap.set(data[i][1], data[i][0])
+    }
+
+    console.log("TEST: 9668 is " + idmap.get("9668"))
 
   } catch (e) {
     error.value = 'Failed to load countdowns. Please try again later.'
@@ -15,13 +24,38 @@ const fetchCountdowns = async () => {
   }
 }
 
+const fetchConnections = async () => {
+  try {
+    const response = await fetch(API_BASE_URL + '/get_connections')
+    const data = await response.json()
+    searchResults.value = data
+
+  } catch (e) {
+    error.value = 'Failed to load countdowns. Please try again later.'
+    console.error('Error fetching countdowns:', e)
+  }
+}
+
+const initConnections = () => {
+
+}
+
 onMounted(() => {
-  fetchCountdowns()
+  fetchNames()
+  fetchConnections()
+  initConnections()
 })
 </script>
 
 <template>
   <div class = "app">
+    <div v-if="searchResults">
+      <div v-for="item in searchResults">
+        {{ console.log(item[0][0]) }}
+        {{ idmap.get(item[0][0].toString()) }} ({{ item[0][0] }}) - {{ idmap.get(item[0][1].toString()) }} ({{ item[0][1] }}) has value {{ item[1] }}
+      </div>
+    </div>
+
     work in progress...
   </div>
 </template>

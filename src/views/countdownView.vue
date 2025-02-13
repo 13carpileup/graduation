@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { API_BASE_URL } from '@/constants'
+
 
 interface CountdownItem {
   title: string
@@ -42,7 +44,7 @@ const updateCountdowns = () => {
 
 const fetchCountdowns = async () => {
   try {
-    const response = await fetch('https://wiki.alexclimie.com/countdowns')
+    const response = await fetch(API_BASE_URL + '/countdowns')
     const data = await response.json()
     
     countdowns.value = data.map(([title, date]: [string, string]) => ({

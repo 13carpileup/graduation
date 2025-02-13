@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
 import { SearchIcon, LoaderIcon, GraduationCapIcon } from 'lucide-vue-next'
+import { API_BASE_URL } from '@/constants'
 
 const searchQuery = ref('')
 const selectedId = ref('')
@@ -14,8 +15,6 @@ const sharedClassesData = ref<[string, number][]>([])
 
 type SharedClassData = [string, number]; // Tuple type: [name, count]
 
-const baseURL = "https://wiki.alexclimie.com/"
-
 const searchNames = async () => {
   if (searchQuery.value.length < 2) {
     searchResults.value = []
@@ -23,7 +22,7 @@ const searchNames = async () => {
   }
   
   try {
-    const response = await axios.get(baseURL + `prefix/${searchQuery.value}`)
+    const response = await axios.get(API_BASE_URL + `/prefix/${searchQuery.value}`)
     searchResults.value = response.data
   } catch (error) {
     console.error('Failed to fetch suggestions:', error)
@@ -49,7 +48,7 @@ const fetchData = async () => {
   showSuggestions.value = false
 
   try {
-    const response = await axios.get(baseURL + `get_data/${selectedId.value}`)
+    const response = await axios.get(API_BASE_URL + `/get_data/${selectedId.value}`)
     classData.value = response.data
   } catch (error) {
     errorMessage.value = 'Failed to fetch data. Please try again.'
@@ -63,7 +62,7 @@ const fetchSharedClasses = async () => {
   if (!selectedId.value) return
   
   try {
-    const response = await axios.get(baseURL + `shared_classes/${selectedId.value}`)
+    const response = await axios.get(API_BASE_URL + `/shared_classes/${selectedId.value}`)
     sharedClassesData.value = response.data
     sharedClassesData.value.sort(function(a, b) {
       return b[1] - a[1];
