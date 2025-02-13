@@ -1,6 +1,5 @@
 use std::fs;
 use std::path::Path;
-use chrono;
 
 pub async fn get_all_names() -> Vec<(String, String)> {
     let file_path = "data/names.txt";

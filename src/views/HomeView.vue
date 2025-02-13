@@ -138,7 +138,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
         <div class="summary-card">
           <div class="summary-content">
             <div class="summary-text">
-              <p class="summary-label">Total Progress</p>
+              
               <div class="summary-numbers">
                 <p class="total-classes">{{ totalClasses }}</p>
                 <p class="classes-label">classes remaining</p>
@@ -310,7 +310,6 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   border-radius: 1rem;
-  padding: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   max-width: 600px;
   margin: 0 auto;
@@ -319,14 +318,13 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
 
 .summary-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
 .summary-text {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  margin: 0 auto;
 }
 
 .summary-label {

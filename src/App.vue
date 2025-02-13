@@ -12,6 +12,9 @@ import { RouterLink, RouterView } from 'vue-router'
         <RouterLink to="/countdown" class="nav-link">
           Countdown
         </RouterLink>
+        <RouterLink to="/connections" class="nav-link">
+          Connections
+        </RouterLink>
       </nav>
     </div>
   </header>

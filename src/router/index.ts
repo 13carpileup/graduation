@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import countdownView from '../views/countdownView.vue'
+import ConnectionsView from '@/views/connectionsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,7 +15,13 @@ const router = createRouter({
       path: '/countdown',
       name: 'countdown',
       component: countdownView
-    }
+    },
+    {
+      path: '/connections',
+      name: 'connections',
+      component: ConnectionsView
+    },
+
 
   ],
 })

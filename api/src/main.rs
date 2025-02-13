@@ -85,7 +85,7 @@ struct MultiParams {
 async fn update_connections(Path(MultiParams { uuid1, uuid2 }): Path<MultiParams>) -> Json<String> {
     println!("{uuid1} and {uuid2}");
     
-    Json("lol".to_string())
+    Json("lol".to_sting())
 }
 
 #[shuttle_runtime::main]
