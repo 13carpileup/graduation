@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import countdownView from '../views/countdownView.vue'
-import ConnectionsView from '@/views/connectionsView.vue'
+import ConnectionsView from '../views/connectionsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

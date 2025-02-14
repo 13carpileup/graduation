@@ -198,7 +198,7 @@ onUnmounted(() => {
 <style scoped>
 .graph-container {
   width: 100%;
-  height: 100vh;
+  height: 80vh;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
