@@ -99,6 +99,30 @@ async fn update_connections(Path(MultiParams { uuid1, uuid2, delta }): Path<Mult
     };
 }
 
+async fn max_connections() -> Json<u64> {
+    let names = file::get_all_names().await;
+    let mut mx = 0;
+    let mut mxPair: String = "a".to_string();
+    println!("working on max...");
+
+    for name in names {
+        let resp = counter::shared_classes(name.1.parse::<u64>().unwrap()).await;
+
+        for pair in resp {
+            let number = pair.1;
+
+            if mx < number {
+                mx = number;
+                mxPair = pair.0.0.clone();
+            }
+        }
+    }
+
+    println!("max: {mx} {mxPair}");
+
+    Json(mx)
+}
+
 #[shuttle_runtime::main]
 pub async fn main() -> shuttle_axum::ShuttleAxum {
     let cors = CorsLayer::new()
@@ -117,6 +141,8 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/get_connections", get(get_connections))
         .route("/update_connections/{uuid1}/{uuid2}/{delta}", get(update_connections))
         .layer(cors);
+
+        //max_connections().await;
 
         Ok(router.into())
     }   
