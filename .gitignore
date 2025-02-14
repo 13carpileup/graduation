@@ -30,3 +30,4 @@ coverage
 *.tsbuildinfo
 
 scraper/speaker.py
+api/log.txt
