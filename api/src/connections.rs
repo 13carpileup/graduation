@@ -64,7 +64,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         counter += 1;
         println!("{counter}/{total} {a1}", a1 = s1.1);
 
-        let resp = super::counter::shared_classes(s1.1.parse::<u64>().unwrap()).await;
+        let resp = super::counter::shared_classes(s1.1.parse::<u64>().unwrap(), false).await;
 
         for s2 in &resp {
             sqlx::query(

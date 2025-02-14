@@ -53,7 +53,7 @@ pub fn process_data(timetable: String) -> Vec<(String, u64)> {
     return out;
 }
 
-pub async fn shared_classes(uuid: u64) -> Vec<((String, u64), u64)> {
+pub async fn shared_classes(uuid: u64, log: bool) -> Vec<((String, u64), u64)> {
     let mut out: Vec<((String, u64), u64)> = vec![];
 
     let raw_data = super::file::get_timetable(uuid).await;
@@ -63,7 +63,9 @@ pub async fn shared_classes(uuid: u64) -> Vec<((String, u64), u64)> {
     for student in all_students {
         let new_uuid = student.1.parse::<u64>().unwrap();
         if new_uuid == uuid {
-            let _ = super::log::write_to_file(student.0).await;
+            if log {
+                let _ = super::log::write_to_file(student.0).await;
+            }
             continue;
         }
 

@@ -1,11 +1,25 @@
-<script setup lang="ts">
+<script setup>
+import * as d3 from 'd3'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { API_BASE_URL } from '@/constants'
+
+const nodes = ref([])
+const data = ref({})
+const error = ref('')
+const simulation = ref(null)
+const width = ref(800)
+const height = ref(600)
+
 const idmap = new Map()
+const connectionsData = ref([])
 
-const error = ref<string | null>(null)
-const searchResults = ref<[[string, string], number][]>([])
-
+const updateDimensions = () => {
+  const container = document.querySelector('.graph-container')
+  if (container) {
+    width.value = container.clientWidth
+    height.value = container.clientHeight
+  }
+}
 
 const fetchNames = async () => {
   try {
@@ -14,120 +28,182 @@ const fetchNames = async () => {
 
     for (let i = 0; i < data.length; i++) {
       idmap.set(data[i][1], data[i][0])
+      nodes.value.push({
+        id: data[i][1],
+        name: data[i][0],
+      })
     }
-
-    console.log("TEST: 9668 is " + idmap.get("9668"))
-
+    console.log("Names fetched!", nodes.value)
   } catch (e) {
-    error.value = 'Failed to load countdowns. Please try again later.'
-    console.error('Error fetching countdowns:', e)
+    error.value = 'Failed to load names. Please try again later.'
+    console.error('Error fetching names:', e)
   }
+}
+
+const initGraph = () => {
+  console.log('Initiating data...')
+  
+  const validNodeIds = new Set(nodes.value.map(node => node.id))
+  
+  const links = connectionsData.value
+    .filter(conn => {
+      const sourceExists = validNodeIds.has(conn[0][0])
+      const targetExists = validNodeIds.has(conn[0][1])
+      
+      if (!sourceExists) {
+        console.warn(`Source node ${conn[0][0]} not found`)
+      }
+      if (!targetExists) {
+        console.warn(`Target node ${conn[0][1]} not found`)
+      }
+      
+      return sourceExists && targetExists && conn[1] >= 50
+    })
+    .map(conn => ({
+      source: conn[0][0],
+      target: conn[0][1],
+      value: conn[1] / 10 || 1
+    }))
+
+  console.log('Valid links created:', links)
+
+  data.value = { 
+    nodes: nodes.value, 
+    links: links 
+  }
+
+  d3.select('#graph').selectAll('*').remove()
+
+  const svg = d3.select('#graph')
+    .attr('width', width.value)
+    .attr('height', height.value)
+
+  const g = svg.append('g')
+    .attr('class', 'everything')
+
+  const zoom = d3.zoom()
+    .scaleExtent([0.1, 4])
+    .on('zoom', (event) => {
+      g.attr('transform', event.transform)
+    })
+  
+  svg.call(zoom)
+
+  const link = g.append('g')
+    .selectAll('line')
+    .data(data.value.links)
+    .join('line')
+    .attr('stroke', '#999')
+    .attr('stroke-opacity', 0.6)
+    .attr('stroke-width', d => Math.sqrt(d.value))
+
+  const node = g.append('g')
+    .selectAll('g')
+    .data(data.value.nodes)
+    .join('g')
+    .call(drag(simulation))
+
+  node.append('circle')
+    .attr('r', 8)
+    .attr('fill', '#69b3a2')
+
+  node.append('text')
+    .text(d => d.name)
+    .attr('x', 12)
+    .attr('y', 4)
+    .style('font-size', '12px')
+    .style('fill', '#333')
+
+  if (nodes.value.length > 0) {
+    simulation.value = d3.forceSimulation(data.value.nodes)
+      .force('link', d3.forceLink(data.value.links)
+        .id(d => d.id)
+        .distance(100))
+      .force('charge', d3.forceManyBody().strength(-200))
+      .force('center', d3.forceCenter(width.value / 2, height.value / 2))
+      .on('tick', () => {
+        link
+          .attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y)
+
+        node
+          .attr('transform', d => `translate(${d.x},${d.y})`)
+      })
+  }
+}
+
+const drag = (simulation) => {
+  const dragstarted = (event, d) => {
+    if (!event.active && simulation.value) simulation.value.alphaTarget(0.3).restart()
+    d.fx = d.x
+    d.fy = d.y
+  }
+
+  const dragged = (event, d) => {
+    d.fx = event.x
+    d.fy = event.y
+  }
+
+  const dragended = (event, d) => {
+    if (!event.active && simulation.value) simulation.value.alphaTarget(0)
+    d.fx = null
+    d.fy = null
+  }
+
+  return d3.drag()
+    .on('start', dragstarted)
+    .on('drag', dragged)
+    .on('end', dragended)
 }
 
 const fetchConnections = async () => {
   try {
+    console.log('Fetching connections...')
     const response = await fetch(API_BASE_URL + '/get_connections')
-    const data = await response.json()
-    searchResults.value = data
+    const rawData = await response.json()
 
+    connectionsData.value = rawData
+
+    initGraph()
   } catch (e) {
-    error.value = 'Failed to load countdowns. Please try again later.'
-    console.error('Error fetching countdowns:', e)
+    error.value = 'Failed to load connections. Please try again later.'
+    console.error('Error fetching connections:', e)
   }
 }
 
-const initConnections = () => {
+onMounted(async () => {
+  window.addEventListener('resize', updateDimensions)
+  updateDimensions()
+  await fetchNames()
+  await fetchConnections()
+})
 
-}
-
-onMounted(() => {
-  fetchNames()
-  fetchConnections()
-  initConnections()
+onUnmounted(() => {
+  window.removeEventListener('resize', updateDimensions)
+  if (simulation.value) {
+    simulation.value.stop()
+  }
 })
 </script>
 
 <template>
-  <div class = "app">
-    <div v-if="searchResults">
-      <div v-for="item in searchResults">
-        {{ console.log(item[0][0]) }}
-        Connection from {{ idmap.get(item[0][0].toString()) }} (id: {{ item[0][0] }}) to {{ idmap.get(item[0][1].toString()) }} (id: {{ item[0][1] }}) has weight {{ item[1] }}
-      </div>
-    </div>
-
-    loading...
+  <div class="graph-container">
+    <div v-if="error" class="error">{{ error }}</div>
+    <svg id="graph"></svg>
   </div>
 </template>
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f5;
-  min-height: 100vh;
-}
-</style>
-
 <style scoped>
-.app {
-  min-height: 100vh;
-  padding: 20px 0;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-.countdown-grid {
-  display: grid;
-  gap: 20px;
-}
-
-.countdown-card {
-  background-color: #ffffff;
-  padding: 24px;
+.graph-container {
+  width: 100%;
+  height: 100vh;
+  background: white;
   border-radius: 8px;
-}
-
-.countdown-card h2 {
-  margin: 0 0 24px 0;
-  color: #333;
-  font-size: 1.4em;
-  font-weight: 500;
-}
-
-.time-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.time-block {
-  text-align: center;
-}
-
-.time-value {
-  font-size: 2em;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.time-label {
-  font-size: 0.85em;
-  color: #666;
-}
-
-.target-date {
-  text-align: right;
-  color: #666;
-  font-size: 0.9em;
-  margin-top: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow: hidden;
 }
 
 .error {
@@ -136,26 +212,27 @@ html, body {
   padding: 16px;
 }
 
-.loading {
-  text-align: center;
-  color: #666;
+svg {
+  display: block;
+  margin: 0 auto;
 }
 
-@media (max-width: 600px) {
-  .container {
-    padding: 0 16px;
-  }
+/* Style the nodes and links */
+:deep(circle) {
+  cursor: pointer;
+  transition: fill 0.2s;
+}
 
-  .countdown-card {
-    padding: 16px;
-  }
+:deep(circle:hover) {
+  fill: #ff7f50;
+}
 
-  .time-grid {
-    gap: 12px;
-  }
+:deep(line) {
+  stroke-linecap: round;
+}
 
-  .time-value {
-    font-size: 1.6em;
-  }
+:deep(text) {
+  user-select: none;
+  pointer-events: none;
 }
 </style>

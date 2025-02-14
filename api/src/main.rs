@@ -61,7 +61,7 @@ async fn prefix_search(Path(PrefixParams { search }): Path<PrefixParams>) -> Jso
 }
 
 async fn shared_classes(Path(Params { uuid }): Path<Params>) -> Json<Vec<((String, u64), u64)>> {
-    Json(counter::shared_classes(uuid).await)
+    Json(counter::shared_classes(uuid, true).await)
 }
 
 async fn countdowns() -> Json<Vec<(String, String)>> {
@@ -106,7 +106,7 @@ async fn max_connections() -> Json<u64> {
     println!("working on max...");
 
     for name in names {
-        let resp = counter::shared_classes(name.1.parse::<u64>().unwrap()).await;
+        let resp = counter::shared_classes(name.1.parse::<u64>().unwrap(), false).await;
 
         for pair in resp {
             let number = pair.1;
