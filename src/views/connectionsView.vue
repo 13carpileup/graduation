@@ -52,7 +52,7 @@ onMounted(() => {
     <div v-if="searchResults">
       <div v-for="item in searchResults">
         {{ console.log(item[0][0]) }}
-        {{ idmap.get(item[0][0].toString()) }} ({{ item[0][0] }}) - {{ idmap.get(item[0][1].toString()) }} ({{ item[0][1] }}) has value {{ item[1] }}
+        Connection from {{ idmap.get(item[0][0].toString()) }} (id: {{ item[0][0] }}) to {{ idmap.get(item[0][1].toString()) }} (id: {{ item[0][1] }}) has weight {{ item[1] }}
       </div>
     </div>
 
