@@ -105,11 +105,16 @@ const initGraph = () => {
       
       return sourceExists && targetExists && conn[2] > min
     })
-    .map(conn => ({
-      source: conn[0],
-      target: conn[1],
-      value: conn[2] - min
-    }))
+    .map(conn => {
+      const sourceNode = nodes.value.find(node => node.id === conn[0]);
+      const targetNode = nodes.value.find(node => node.id === conn[1]);
+      
+      return {
+        source: sourceNode,
+        target: targetNode,
+        value: conn[2] - min,
+      };
+    })
 
   console.log('Valid links created:', links)
 
@@ -186,7 +191,7 @@ const fetchConnections = async () => {
     const response = await fetch(`${API_BASE_URL}/get_connections`)
     const rawData = await response.json()
 
-    rawData.forEach(d => {
+    rawData.forEach((d: number[]) => {
       connectionsData.value.push([d[0][0], d[0][1], d[1] / 10])
     });
 
