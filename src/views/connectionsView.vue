@@ -92,29 +92,35 @@ const initGraph = () => {
   const min = 5
 
   const links = connectionsData.value
-    .filter(conn => {
-      const sourceExists = validNodeIds.has(conn[0])
-      const targetExists = validNodeIds.has(conn[1])
-      
-      if (!sourceExists) {
-        console.warn(`Source node ${conn[0]} not found`)
-      }
-      if (!targetExists) {
-        console.warn(`Target node ${conn[1]} not found`)
-      }
-      
-      return sourceExists && targetExists && conn[2] > min
-    })
-    .map(conn => {
-      const sourceNode = nodes.value.find(node => node.id === conn[0]);
-      const targetNode = nodes.value.find(node => node.id === conn[1]);
-      
-      return {
-        source: sourceNode,
-        target: targetNode,
-        value: conn[2] - min,
-      };
-    })
+  .filter(conn => {
+    const sourceExists = validNodeIds.has(conn[0]);
+    const targetExists = validNodeIds.has(conn[1]);
+
+    if (!sourceExists) {
+      console.warn(`Source node ${conn[0]} not found`);
+    }
+    if (!targetExists) {
+      console.warn(`Target node ${conn[1]} not found`);
+    }
+
+    return sourceExists && targetExists && conn[2] > min;
+  })
+  .map(conn => {
+    const sourceNode = nodes.value.find(node => node.id === conn[0]);
+    const targetNode = nodes.value.find(node => node.id === conn[1]);
+
+    if (!sourceNode || !targetNode) {
+      console.warn('Invalid source or target node:', conn);
+      return null; 
+    }
+
+    return {
+      source: sourceNode,
+      target: targetNode,
+      value: conn[2] - min,
+    };
+  })
+  .filter(link => link !== null) as Link[]; 
 
   console.log('Valid links created:', links)
 
@@ -132,7 +138,7 @@ const initGraph = () => {
   const g = svg.append('g')
     .attr('class', 'everything')
 
-  const zoom = d3.zoom()
+  const zoom = d3.zoom<any, any>()
     .scaleExtent([0.1, 4])
     .on('zoom', (event) => {
       g.attr('transform', event.transform)
@@ -152,7 +158,7 @@ const initGraph = () => {
     .selectAll('g')
     .data(data.value.nodes)
     .join('g')
-    .call(drag(simulation))
+    .call(drag(simulation) as any)
 
   node.append('circle')
     .attr('r', 8)
