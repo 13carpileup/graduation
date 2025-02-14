@@ -197,7 +197,7 @@ const fetchConnections = async () => {
     const response = await fetch(`${API_BASE_URL}/get_connections`)
     const rawData = await response.json()
 
-    rawData.forEach((d: number[]) => {
+    rawData.forEach((d: [[number, number], number]) => {
       connectionsData.value.push([d[0][0], d[0][1], d[1] / 10])
     });
 
