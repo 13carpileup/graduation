@@ -31,7 +31,7 @@ const width = ref<number>(800)
 const height = ref<number>(600)
 
 const idmap = new Map<string | number, string>()
-const connectionsData = ref<[string | number, string | number][]>([])
+const connectionsData = ref<[number, number, number][]>([])
 
 const updateDimensions = () => {
   const container = document.querySelector('.graph-container')
@@ -89,10 +89,12 @@ const initGraph = () => {
   
   const validNodeIds = new Set(nodes.value.map(node => node.id))
   
+  const min = 5
+
   const links = connectionsData.value
     .filter(conn => {
-      const sourceExists = validNodeIds.has(conn[0][0])
-      const targetExists = validNodeIds.has(conn[0][1])
+      const sourceExists = validNodeIds.has(conn[0])
+      const targetExists = validNodeIds.has(conn[1])
       
       if (!sourceExists) {
         console.warn(`Source node ${conn[0]} not found`)
@@ -101,12 +103,12 @@ const initGraph = () => {
         console.warn(`Target node ${conn[1]} not found`)
       }
       
-      return sourceExists && targetExists && conn[1] as number > 50
+      return sourceExists && targetExists && conn[2] > min
     })
     .map(conn => ({
-      source: conn[0][0],
-      target: conn[0][1],
-      value: Math.ceil(conn[1] as number / 10) 
+      source: conn[0],
+      target: conn[1],
+      value: conn[2] - min
     }))
 
   console.log('Valid links created:', links)
@@ -184,7 +186,9 @@ const fetchConnections = async () => {
     const response = await fetch(`${API_BASE_URL}/get_connections`)
     const rawData = await response.json()
 
-    connectionsData.value = rawData
+    rawData.forEach(d => {
+      connectionsData.value.push([d[0][0], d[0][1], d[1] / 10])
+    });
 
     initGraph()
   } catch (e) {
