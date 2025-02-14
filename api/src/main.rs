@@ -143,6 +143,6 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .layer(cors);
 
         //max_connections().await;
-
+	connections::init_database().await;
         Ok(router.into())
     }   

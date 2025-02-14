@@ -11,7 +11,7 @@ use sqlx::Row;
 use std::collections::HashMap;
 
 // helpers 
-fn row_to_json(row: &PgRow) -> HashMap<String, String> {
+pub fn row_to_json(row: &PgRow) -> HashMap<String, String> {
     let mut result = HashMap::new();
     for col in row.columns() {
         let value = row.try_get_raw(col.ordinal()).unwrap();
@@ -34,7 +34,7 @@ fn row_to_json(row: &PgRow) -> HashMap<String, String> {
 }
 
 // connectors
-async fn init_database() -> Result<(), sqlx::Error> {
+pub async fn init_database() -> Result<(), sqlx::Error> {
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect("postgres://postgres:postgres@localhost/grad")
