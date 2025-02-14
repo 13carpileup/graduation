@@ -144,10 +144,10 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
 
         //max_connections().await;
 	
-	//match connections::init_database().await {
-	//	Ok(_e) => println!("Successfully initted"),
-//		Err(v) => println!("{v}")
-	//};
+	match connections::init_database().await {
+		Ok(_e) => println!("Successfully initted"),
+		Err(v) => println!("{v}")
+	};
 
         Ok(router.into())
     }   

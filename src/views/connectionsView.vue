@@ -89,7 +89,7 @@ const initGraph = () => {
   
   const validNodeIds = new Set(nodes.value.map(node => node.id))
   
-  const min = 5
+  const min = 0
 
   const links = connectionsData.value
   .filter(conn => {

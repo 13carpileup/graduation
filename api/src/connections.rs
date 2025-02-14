@@ -40,11 +40,11 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         .connect("postgres://postgres:postgres@localhost/grad")
         .await?;
 
-        //sqlx::query(
-        //    "DROP TABLE Connections;"
-        //)
-        //.execute(&pool)
-        //.await?;
+    sqlx::query(
+        "DROP TABLE Connections;"
+    )
+    .execute(&pool)
+    .await?;
 
     sqlx::query(
         "CREATE TABLE IF NOT EXISTS Connections (
@@ -64,9 +64,18 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         counter += 1;
         println!("{counter}/{total} {a1}", a1 = s1.1);
 
-        let resp = super::counter::shared_classes(s1.1.parse::<u64>().unwrap(), false).await;
+        let mut resp = super::counter::shared_classes(s1.1.parse::<u64>().unwrap(), false).await;
+        resp.sort_by(|a, b| {
+            a.1.cmp(&b.1)  
+        });
 
-        for s2 in &resp {
+        let rev: Vec<&((String, u64), u64)> = resp.iter().rev().collect();
+
+        println!("{fst}", fst = rev[0].1);
+
+        for i in 0..5 {
+            let s2 = rev[i];
+            
             sqlx::query(
                 &format!(
                 "INSERT INTO Connections VALUES ('{a1}-{a2}', '{val}') ON CONFLICT (connection) DO UPDATE SET weight = EXCLUDED.weight;",
