@@ -118,6 +118,7 @@ const initGraph = () => {
       source: sourceNode,
       target: targetNode,
       value: (2) ** (conn[2] - 4),
+      strength: conn[2]
     };
   })
   .filter(link => link !== null) as Link[]; 
@@ -172,11 +173,13 @@ const initGraph = () => {
     .style('fill', '#333')
 
   if (nodes.value.length > 0) {
-    simulation.value = d3.forceSimulation(data.value.nodes)
-      .force('link', d3.forceLink(data.value.links)
-        .id((d: any) => d.id)
-        .distance(100))
-      .force('charge', d3.forceManyBody().strength(-200))
+      simulation.value = d3.forceSimulation(data.value.nodes)
+        .force('link', d3.forceLink(data.value.links).strength((link: any) => {console.log("link val " + link.strength); return link.strength / 7;})
+          .id((d: any) => d.id)
+          .distance((link: any) => {
+            return 144 - link.value; 
+          }))
+      .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width.value / 2, height.value / 2))
       .on('tick', () => {
         link
