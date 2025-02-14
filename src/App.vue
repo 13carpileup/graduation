@@ -39,10 +39,11 @@ import { RouterLink, RouterView } from 'vue-router'
   display: flex;
   align-items: center;
   height: 4rem;
+  flex-wrap: wrap;
 }
 
 .nav-link {
-  margin: 3rem;
+  margin: 0 3rem;
   float:left;
   font-size: 1.125rem;
   font-weight: 600;
@@ -55,6 +56,18 @@ import { RouterLink, RouterView } from 'vue-router'
 
 .nav-link:hover {
   opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column; 
+    align-items: center; 
+  }
+
+  .nav-link {
+    margin: 1.2rem 0; 
+    font-size: 1rem; 
+  }
 }
 </style>
 

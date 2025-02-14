@@ -175,7 +175,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
               v-for="[name, count] in sharedClassesData"
               :key="name"
               class="shared-class-bar"
-              :style="{ width: `${Math.max((count / Math.max(...sharedClassesData.map(([_, c]) => c))) * 97, 20)}%` }"
+              :style="{ width: `${Math.max((count / Math.max(...sharedClassesData.map(([_, c]) => c))) * 85, 20)}%` }"
               @click="selectStudent(name[0], name[1])"
             >
               <span class="shared-class-name">{{ name[0] }}</span>
@@ -228,11 +228,15 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
 
 .search-container {
   max-width: 500px;
-  margin: 0 auto 3rem;
+  margin: 0 auto 3vw;
 }
 
 .search-wrapper {
   position: relative;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
 }
 
 .search-input {
@@ -243,6 +247,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
   border-radius: 0.75rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
+  margin: 0 auto;
 }
 
 .search-input:focus {
@@ -253,12 +258,9 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
 
 .search-icon {
   position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  width: 1.25rem;
-  height: 1.25rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  color: #888;
 }
 
 .search-button {
@@ -312,7 +314,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   max-width: 600px;
   margin: 0 auto;
-  min-width: 23rem;
+  min-width: 23vw;
 }
 
 .summary-content {
@@ -577,7 +579,6 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-width: 150px;
   transition: width 0.3s ease;
 }
 
