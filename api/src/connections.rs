@@ -64,11 +64,13 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         counter += 1;
         println!("{counter}/{total} {a1}", a1 = s1.1);
 
-        for s2 in &students {
+        let resp = super::counter::shared_classes(s1.1.parse::<u64>().unwrap()).await;
+
+        for s2 in &resp {
             sqlx::query(
                 &format!(
-                "INSERT INTO Connections VALUES ('{a1}-{a2}', '0') ON CONFLICT (connection) DO UPDATE SET weight = EXCLUDED.weight;",
-                a1 = s1.1, a2 = s2.1
+                "INSERT INTO Connections VALUES ('{a1}-{a2}', '{val}') ON CONFLICT (connection) DO UPDATE SET weight = EXCLUDED.weight;",
+                a1 = s1.1, a2 = s2.0.1, val = s2.1
                 )
             )
             .execute(&pool)

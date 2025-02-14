@@ -56,7 +56,7 @@ onMounted(() => {
       </div>
     </div>
 
-    work in progress...
+    loading...
   </div>
 </template>
 
