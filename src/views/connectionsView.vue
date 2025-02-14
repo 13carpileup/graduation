@@ -13,8 +13,8 @@ interface Node {
 }
 
 interface Link {
-  source: string | number | Node
-  target: string | number | Node
+  source: Node
+  target: Node
   value: number
 }
 
