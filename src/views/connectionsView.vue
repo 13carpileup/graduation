@@ -232,7 +232,8 @@ onUnmounted(() => {
 
 <style scoped>
 .graph-container {
-  width: 100%;
+  margin: 0 auto;
+  width: 90%;
   height: 80vh;
   background: white;
   border-radius: 8px;
