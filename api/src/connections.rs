@@ -40,11 +40,11 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         .connect("postgres://postgres:postgres@localhost/grad")
         .await?;
 
-        sqlx::query(
-            "DROP TABLE Connections;"
-        )
-        .execute(&pool)
-        .await?;
+        //sqlx::query(
+        //    "DROP TABLE Connections;"
+        //)
+        //.execute(&pool)
+        //.await?;
 
     sqlx::query(
         "CREATE TABLE IF NOT EXISTS Connections (

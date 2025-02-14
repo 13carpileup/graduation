@@ -143,6 +143,11 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .layer(cors);
 
         //max_connections().await;
-	connections::init_database().await;
+	
+	//match connections::init_database().await {
+	//	Ok(_e) => println!("Successfully initted"),
+//		Err(v) => println!("{v}")
+	//};
+
         Ok(router.into())
     }   
