@@ -73,9 +73,9 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
 
         println!("{fst}", fst = rev[0].1);
 
-        for i in 0..5 {
+        for i in 0..3 {
             let s2 = rev[i];
-            
+
             sqlx::query(
                 &format!(
                 "INSERT INTO Connections VALUES ('{a1}-{a2}', '{val}') ON CONFLICT (connection) DO UPDATE SET weight = EXCLUDED.weight;",

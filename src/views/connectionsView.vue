@@ -117,7 +117,7 @@ const initGraph = () => {
     return {
       source: sourceNode,
       target: targetNode,
-      value: conn[2] - min,
+      value: (2) ** (conn[2] - 4),
     };
   })
   .filter(link => link !== null) as Link[]; 
