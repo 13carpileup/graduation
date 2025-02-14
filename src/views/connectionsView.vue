@@ -140,12 +140,12 @@ const initGraph = () => {
     .attr('class', 'everything')
 
   const zoom = d3.zoom<any, any>()
-    .scaleExtent([0.1, 4])
+    .scaleExtent([0.2, 200])
     .on('zoom', (event) => {
       g.attr('transform', event.transform)
     })
   
-  svg.call(zoom)
+  svg.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(0.7))
 
   const link = g.append('g')
     .selectAll('line')
@@ -174,11 +174,9 @@ const initGraph = () => {
 
   if (nodes.value.length > 0) {
       simulation.value = d3.forceSimulation(data.value.nodes)
-        .force('link', d3.forceLink(data.value.links).strength((link: any) => {console.log("link val " + link.strength); return link.strength / 7;})
+        .force('link', d3.forceLink(data.value.links).strength((link: any) => link.strength / 7)
           .id((d: any) => d.id)
-          .distance((link: any) => {
-            return 144 - link.value; 
-          }))
+          .distance(60))
       .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width.value / 2, height.value / 2))
       .on('tick', () => {
