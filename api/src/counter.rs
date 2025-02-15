@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use chrono::{NaiveDate, Utc};
 
 use crate::structs::User;
@@ -91,9 +91,21 @@ pub async fn add_shared_classes(uuid: u64, log: bool) -> (Vec<(String, u64)>, Ve
 }
 
 pub async fn get_classes(id: u64) -> Vec<String> {
-    let raw_data = super::file::get_timetable(id);
-    
-    
+    let raw_data = super::file::get_timetable(id).await;
+    let lines = raw_data.split("\r\n");
+    let mut classes: HashSet<String> = HashSet::new();
 
-    vec![]
+    for line in lines {
+        if line.starts_with("SUMMARY:") {
+            let class_code = &line.split(':').collect::<Vec<&str>>()[1][2..5];
+
+            classes.insert(class_code.to_string());
+
+            println!("{class_code}");
+        }
+    }
+
+    let v: Vec<String> = classes.into_iter().collect();
+
+    v
 }

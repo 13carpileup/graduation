@@ -13,7 +13,7 @@ mod file;
 mod counter;
 mod countdown;
 mod log;
-mod connections;
+mod graph;
 pub mod structs;
 
 async fn hello_world() -> &'static str {
@@ -66,7 +66,7 @@ async fn countdowns() -> Json<Vec<(String, String)>> {
 }
 
 async fn get_connections() -> Json<Vec<((String, String), u64)>> {
-    let resp = connections::get_connections().await.unwrap();
+    let resp = graph::connections::get_connections().await.unwrap();
     
     Json(resp)
 }
@@ -86,12 +86,18 @@ async fn update_connections(Path(MultiParams { uuid1, uuid2, delta }): Path<Mult
         return Json("Invalid delta".to_string());
     }
     
-    let resp = connections::update_connection(uuid1, uuid2, delta).await;
+    let resp = graph::connections::update_connection(uuid1, uuid2, delta).await;
 
     match resp {
         Ok(_e) => return  Json("Success".to_string()),
         Err(v) => return Json(v.to_string())
     };
+}
+
+async fn get_classes(Path(Params { uuid }): Path<Params>) -> Json<Vec<String>> {
+    let resp = counter::get_classes(uuid).await;
+
+    Json(resp)
 }
 
 // async fn max_connections() -> Json<u64> {
@@ -134,14 +140,17 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/countdowns", get(countdowns))
         .route("/get_connections", get(get_connections))
         .route("/update_connections/{uuid1}/{uuid2}/{delta}", get(update_connections))
+        .route("/get_classes/{uuid}", get(get_classes))
         .layer(cors);
 
-        //max_connections().await;
+    //max_connections().await;
 	
-	match connections::init_database().await {
-		Ok(_e) => println!("Successfully initted"),
-		Err(v) => println!("{v}")
-	};
+	// match connections::init_database().await {
+	// 	Ok(_e) => println!("Successfully initted"),
+	// 	Err(v) => println!("{v}")
+	// };
 
-        Ok(router.into())
-    }   
+    counter::get_classes(9668).await;
+
+    Ok(router.into())
+}   

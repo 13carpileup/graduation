@@ -11,6 +11,9 @@ use sqlx::Row;
 use std::collections::HashMap;
 
 use crate::structs::User;
+use super::get_all_names;
+use super::add_shared_classes;
+use super::write_to_file;
 
 // helpers 
 pub fn row_to_json(row: &PgRow) -> HashMap<String, String> {
@@ -57,7 +60,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
     .execute(&pool)
     .await?;
 
-    let students = super::file::get_all_names().await;
+    let students = get_all_names().await;
 
     let mut counter = 0;
     let total = students.len();
@@ -66,7 +69,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         counter += 1;
         println!("{counter}/{total} {a1}", a1 = s1.1);
 
-        let mut resp = super::counter::add_shared_classes(s1.1.parse::<u64>().unwrap(), false).await.1;
+        let mut resp = add_shared_classes(s1.1.parse::<u64>().unwrap(), false).await.1;
         resp.sort_by(|a, b| {
             a.1.cmp(&b.1)  
         });
@@ -140,7 +143,7 @@ pub async fn update_connection(id1: String, id2: String, delta: i64) -> Result<(
     .connect("postgres://postgres:postgres@localhost/grad")
     .await?;
 
-    super::log::write_to_file(format!("Updating {id1} and {id2} by {delta}")).await;
+    write_to_file(format!("Updating {id1} and {id2} by {delta}")).await;
 
     let resps = sqlx::query(&format!("SELECT * FROM Connections WHERE connection = '{id1}-{id2}'")).fetch_all(&pool).await?;
 
