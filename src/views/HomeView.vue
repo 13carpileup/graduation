@@ -11,7 +11,7 @@ const classData = ref([])
 const errorMessage = ref('')
 const isLoading = ref(false)
 const showSuggestions = ref(false)
-const sharedClassesData = ref<[string, number][]>([])
+const sharedClassesData = ref<[{id: string, name: string}, number][]>([])
 
 type SharedClassData = [string, number]; // Tuple type: [name, count]
 
@@ -37,7 +37,6 @@ const selectStudent = (name: any, id: any) => {
   localStorage.setItem("name", name)
   showSuggestions.value = false
   fetchData()
-  fetchSharedClasses()
 }
 
 const fetchData = async () => {
@@ -49,28 +48,19 @@ const fetchData = async () => {
 
   try {
     const response = await axios.get(API_BASE_URL + `/get_data/${selectedId.value}`)
-    classData.value = response.data
-  } catch (error) {
-    errorMessage.value = 'Failed to fetch data. Please try again.'
-    console.error(error)
-  } finally {
-    isLoading.value = false
-  }
-}
+    classData.value = response.data[0]
 
-const fetchSharedClasses = async () => {
-  if (!selectedId.value) return
-  
-  try {
-    const response = await axios.get(API_BASE_URL + `/shared_classes/${selectedId.value}`)
-    sharedClassesData.value = response.data
+    sharedClassesData.value = response.data[1]
     sharedClassesData.value.sort(function(a, b) {
       return b[1] - a[1];
     });
     sharedClassesData.value = sharedClassesData.value.slice(0, 15); 
 
   } catch (error) {
-    console.error('Failed to fetch shared classes:', error)
+    errorMessage.value = 'Failed to fetch data. Please try again.'
+    console.error(error)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -172,13 +162,13 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
           <h2 class="shared-classes-title">Who will you be spending that time with?</h2>
           <div class="shared-classes-grid">
             <button
-              v-for="[name, count] in sharedClassesData"
-              :key="name"
+              v-for="[student, count] in sharedClassesData"
+              :key="student.id"
               class="shared-class-bar"
               :style="{ width: `${Math.max((count / Math.max(...sharedClassesData.map(([_, c]) => c))) * 85, 20)}%` }"
-              @click="selectStudent(name[0], name[1])"
+              @click="selectStudent(student.name, student.id)"
             >
-              <span class="shared-class-name">{{ name[0] }}</span>
+              <span class="shared-class-name">{{ student.name }}</span>
               <span class="shared-class-count">{{ count }} classes</span>
             </button>
           </div>

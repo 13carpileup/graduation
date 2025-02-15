@@ -146,6 +146,7 @@ name = "api"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "axum-cookie",
  "cargo-shuttle",
  "chrono",
  "http",
@@ -260,6 +261,19 @@ dependencies = [
  "tower-layer",
  "tower-service",
  "tracing",
+]
+
+[[package]]
+name = "axum-cookie"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c7644b4ffaf6f739899c8f2a61db7f45da5258d2456d1c432b361aafca8d26cc"
+dependencies = [
+ "axum-core",
+ "cookie-rs",
+ "http",
+ "tower-layer",
+ "tower-service",
 ]
 
 [[package]]
@@ -732,6 +746,12 @@ name = "constant_time_eq"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
+
+[[package]]
+name = "cookie-rs"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9d48e0e4b63b966d5951f2d88090995d16b76679042d1375f70b404f1f23948"
 
 [[package]]
 name = "core-foundation"

@@ -10,6 +10,8 @@ use sqlx::ValueRef;
 use sqlx::Row;
 use std::collections::HashMap;
 
+use crate::structs::User;
+
 // helpers 
 pub fn row_to_json(row: &PgRow) -> HashMap<String, String> {
     let mut result = HashMap::new();
@@ -64,12 +66,12 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         counter += 1;
         println!("{counter}/{total} {a1}", a1 = s1.1);
 
-        let mut resp = super::counter::shared_classes(s1.1.parse::<u64>().unwrap(), false).await;
+        let mut resp = super::counter::add_shared_classes(s1.1.parse::<u64>().unwrap(), false).await.1;
         resp.sort_by(|a, b| {
             a.1.cmp(&b.1)  
         });
 
-        let rev: Vec<&((String, u64), u64)> = resp.iter().rev().collect();
+        let rev: Vec<&(User, u64)> = resp.iter().rev().collect();
 
         println!("{fst}", fst = rev[0].1);
 
@@ -79,7 +81,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
             sqlx::query(
                 &format!(
                 "INSERT INTO Connections VALUES ('{a1}-{a2}', '{val}') ON CONFLICT (connection) DO UPDATE SET weight = EXCLUDED.weight;",
-                a1 = s1.1, a2 = s2.0.1, val = s2.1
+                a1 = s1.1, a2 = s2.0.id, val = s2.1
                 )
             )
             .execute(&pool)

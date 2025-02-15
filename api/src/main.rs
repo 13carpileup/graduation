@@ -5,15 +5,16 @@ use axum::{
 };
 use shuttle_axum::axum::Router; // Import Router from shuttle_axum::axum
 use serde::Deserialize;
+use structs::User;
 use tower_http::cors::{Any, CorsLayer}; 
 use http::Method;
-
 
 mod file;
 mod counter;
 mod countdown;
 mod log;
 mod connections;
+pub mod structs;
 
 async fn hello_world() -> &'static str {
     "Hello world!"
@@ -30,10 +31,8 @@ struct Params {
     uuid: u64
 }
 
-async fn get_timetable_data(Path(Params { uuid }): Path<Params>) -> Json<Vec<(String, u64)>> {
-    let timetable = file::get_timetable(uuid).await;
-
-    let data = counter::process_data(timetable);
+async fn get_timetable_data(Path(Params { uuid }): Path<Params>) -> Json<(Vec<(String, u64)>, Vec<(User, u64)>)> {
+    let data = counter::add_shared_classes(uuid, true).await;
     
     Json(data)
 }
@@ -58,10 +57,6 @@ async fn prefix_search(Path(PrefixParams { search }): Path<PrefixParams>) -> Jso
     }
 
     Json(matches)
-}
-
-async fn shared_classes(Path(Params { uuid }): Path<Params>) -> Json<Vec<((String, u64), u64)>> {
-    Json(counter::shared_classes(uuid, true).await)
 }
 
 async fn countdowns() -> Json<Vec<(String, String)>> {
@@ -99,29 +94,29 @@ async fn update_connections(Path(MultiParams { uuid1, uuid2, delta }): Path<Mult
     };
 }
 
-async fn max_connections() -> Json<u64> {
-    let names = file::get_all_names().await;
-    let mut mx = 0;
-    let mut mxPair: String = "a".to_string();
-    println!("working on max...");
+// async fn max_connections() -> Json<u64> {
+//     let names = file::get_all_names().await;
+//     let mut mx = 0;
+//     let mut mxPair: String = "a".to_string();
+//     println!("working on max...");
 
-    for name in names {
-        let resp = counter::shared_classes(name.1.parse::<u64>().unwrap(), false).await;
+//     for name in names {
+//         let resp = counter::add_shared_classes(name.1.parse::<u64>().unwrap(), false).await.1;
 
-        for pair in resp {
-            let number = pair.1;
+//         for pair in resp {
+//             let number = pair.1;
 
-            if mx < number {
-                mx = number;
-                mxPair = pair.0.0.clone();
-            }
-        }
-    }
+//             if mx < number {
+//                 mx = number;
+//                 mxPair = pair.0.0.clone();
+//             }
+//         }
+//     }
 
-    println!("max: {mx} {mxPair}");
+//     println!("max: {mx} {mxPair}");
 
-    Json(mx)
-}
+//     Json(mx)
+// }
 
 #[shuttle_runtime::main]
 pub async fn main() -> shuttle_axum::ShuttleAxum {
@@ -136,7 +131,6 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/get_all_names", get(get_all_names))
         .route("/get_data/{uuid}", get(get_timetable_data))
         .route("/prefix/{search}", get(prefix_search))
-        .route("/shared_classes/{uuid}", get(shared_classes))
         .route("/countdowns", get(countdowns))
         .route("/get_connections", get(get_connections))
         .route("/update_connections/{uuid1}/{uuid2}/{delta}", get(update_connections))

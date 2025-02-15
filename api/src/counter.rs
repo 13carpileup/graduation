@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use chrono::{NaiveDate, Utc};
 
+use crate::structs::User;
+
 fn check_date(uuid: &str) -> bool {
     let day = uuid[6..8].to_string().parse::<u32>().unwrap(); 
     let month = uuid[4..6].to_string().parse::<u32>().unwrap(); 
@@ -53,8 +55,8 @@ pub fn process_data(timetable: String) -> Vec<(String, u64)> {
     return out;
 }
 
-pub async fn shared_classes(uuid: u64, log: bool) -> Vec<((String, u64), u64)> {
-    let mut out: Vec<((String, u64), u64)> = vec![];
+pub async fn add_shared_classes(uuid: u64, log: bool) -> (Vec<(String, u64)>, Vec<(User, u64)>) {
+    let mut out: Vec<(User, u64)> = vec![];
 
     let raw_data = super::file::get_timetable(uuid).await;
     let processed_data = process_data(raw_data);
@@ -82,8 +84,16 @@ pub async fn shared_classes(uuid: u64, log: bool) -> Vec<((String, u64), u64)> {
             }
         }
 
-        out.push(((student.0, new_uuid), total_classes));
+        out.push((User {name: student.0, id: new_uuid}, total_classes));
     }
     
-    out
+    (processed_data, out)
+}
+
+pub async fn get_classes(id: u64) -> Vec<String> {
+    let raw_data = super::file::get_timetable(id);
+    
+    
+
+    vec![]
 }
