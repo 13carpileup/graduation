@@ -177,7 +177,7 @@ const initGraph = () => {
         .force('link', d3.forceLink(data.value.links).strength((link: any) => link.strength / 7)
           .id((d: any) => d.id)
           .distance(60))
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('charge', d3.forceManyBody().strength(-180))
       .force('center', d3.forceCenter(width.value / 2, height.value / 2))
       .on('tick', () => {
         link
