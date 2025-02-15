@@ -153,7 +153,7 @@ const initGraph = () => {
     .join('line')
     .attr('stroke', '#999')
     .attr('stroke-opacity', 0.6)
-    .attr('stroke-width', d => Math.sqrt(d.value))
+    .attr('stroke-width', d => Math.sqrt(d.value) / 4)
 
   const node = g.append('g')
     .selectAll('g')
@@ -174,10 +174,10 @@ const initGraph = () => {
 
   if (nodes.value.length > 0) {
       simulation.value = d3.forceSimulation(data.value.nodes)
-        .force('link', d3.forceLink(data.value.links).strength((link: any) => link.strength / 7)
+        .force('link', d3.forceLink(data.value.links).strength((link: any) => link.strength / 60)
           .id((d: any) => d.id)
           .distance(60))
-      .force('charge', d3.forceManyBody().strength(-180))
+      .force('charge', d3.forceManyBody().strength(-600))
       .force('center', d3.forceCenter(width.value / 2, height.value / 2))
       .on('tick', () => {
         link
