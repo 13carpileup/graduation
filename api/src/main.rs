@@ -152,16 +152,11 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/get_classes/{uuid}", get(get_classes))
         .layer(cors);
 
-    //max_connections().await;
-
-    let args: Vec<String> = env::args().collect();
-    
-
-    // match graph::connections::init_database().await {
-    //     Ok(_e) => println!("Successfully initted"),
-    //     Err(v) => println!("{v}")
-    // };
-
+    //max_connection
+//	match connections::init_database().await {
+//		Ok(_e) => println!("Successfully initted"),
+//		Err(v) => println!("{v}")
+//	};
 
     counter::get_classes(9668).await;
 
