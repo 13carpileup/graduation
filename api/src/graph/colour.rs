@@ -60,25 +60,9 @@ pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))>
     }
 
     // traverse graph
-    let mut visited: HashMap<Vec<String>, bool> = HashMap::new();
-
-    for val in &v_space {
-        visited.insert(val.clone(), false);
-    }
-
-    let colour_prime = (40, 40, 40);
 
     let elem = v_space.iter().next().unwrap().clone();
-    //println!("Initial loop...");
-    traverse_path(&adj_list, &mut visited, &mut colour_map, elem.clone(), colour_prime);
-
-    for set in &v_space {
-        let resp = visited.get(set).unwrap();
-        if !resp {
-            println!("Traversing again...");
-            traverse_path(&adj_list, &mut visited, &mut colour_map, (*set.clone()).to_vec(), colour_prime);
-        }
-    }
+    let colour_map = returns_colours(&v_space, &adj_list, elem.clone());
 
     //println!("Constructing map...");
     for student in &students {
@@ -95,6 +79,29 @@ pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))>
     
     //println!("Exitting out...");
     out
+}
+
+fn returns_colours(v_space: &HashSet<Vec<String>>, adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, prime_node: Vec<String>) ->  HashMap<Vec<String>, (i32, i32, i32)> {
+    let mut colour_map: HashMap<Vec<String>, (i32, i32, i32)> = HashMap::new();
+    let mut visited: HashMap<Vec<String>, bool> = HashMap::new();
+
+    for val in v_space {
+        visited.insert(val.clone(), false);
+    }
+
+    let colour_prime = (10, 10, 10);
+
+    traverse_path(&adj_list, &mut visited, &mut colour_map, prime_node.clone(), colour_prime);
+
+    for set in v_space {
+        let resp = visited.get(set).unwrap();
+        if !resp {
+            println!("Traversing again...");
+            traverse_path(&adj_list, &mut visited, &mut colour_map, (*set.clone()).to_vec(), colour_prime);
+        }
+    }
+
+    colour_map
 }
 
 fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mut HashMap<Vec<String>, bool>, colour_map: &mut HashMap<Vec<String>, (i32, i32, i32)>, prime_node: Vec<String>, prime_colour: (i32, i32, i32)) {
@@ -133,7 +140,7 @@ fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mu
 }
 
 fn update_colour(og: (i32, i32, i32), index: u64) -> (i32, i32, i32) {
-    let delta = 15;
+    let delta = 40;
     let mut out = og;
     let num = rand::rng().random_range(0..100);
     //println!("Index is {index}");
