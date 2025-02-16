@@ -63,10 +63,10 @@ pub async fn add_shared_classes(uuid: u64, log: bool) -> (Vec<(String, u64)>, Ve
 
     let all_students = super::file::get_all_names().await;
     for student in all_students {
-        let new_uuid = student.1.parse::<u64>().unwrap();
+        let new_uuid = student.id;
         if new_uuid == uuid {
             if log {
-                let _ = super::log::write_to_file(student.0).await;
+                let _ = super::log::write_to_file(student.name).await;
             }
             continue;
         }
@@ -84,7 +84,7 @@ pub async fn add_shared_classes(uuid: u64, log: bool) -> (Vec<(String, u64)>, Ve
             }
         }
 
-        out.push((User {name: student.0, id: new_uuid}, total_classes));
+        out.push((User {name: student.name, id: new_uuid}, total_classes));
     }
     
     (processed_data, out)
@@ -102,7 +102,7 @@ pub async fn get_classes(id: u64) -> Vec<String> {
 
             classes.insert(class_code.to_string());
 
-            println!("{class_code}");
+            //println!("{class_code}");
         }
     }
 

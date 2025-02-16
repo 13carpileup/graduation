@@ -20,7 +20,7 @@ async fn hello_world() -> &'static str {
     "Hello world!"
 }
 
-async fn get_all_names() -> Json<Vec<(String, String)>> {
+async fn get_all_names() -> Json<Vec<User>> {
     let res = file::get_all_names().await;
     
     Json(res)
@@ -42,13 +42,13 @@ struct PrefixParams {
     search: String
 }
 
-async fn prefix_search(Path(PrefixParams { search }): Path<PrefixParams>) -> Json<Vec<(String, String)>> {
+async fn prefix_search(Path(PrefixParams { search }): Path<PrefixParams>) -> Json<Vec<User>> {
     let names = file::get_all_names().await;
 
-    let mut matches: Vec<(String, String)> = vec![];
+    let mut matches: Vec<User> = vec![];
 
     for individual in names {
-        let name = individual.0.to_lowercase();
+        let name = individual.name.to_lowercase();
         let checked_search = search.to_lowercase();
 
         if name.starts_with(&checked_search) {
@@ -65,10 +65,12 @@ async fn countdowns() -> Json<Vec<(String, String)>> {
     Json(countdowns)
 }
 
-async fn get_connections() -> Json<Vec<((String, String), u64)>> {
+async fn get_connections() -> Json<(Vec<((String, String), u64)>, Vec<(User, (i32, i32, i32))>)> {
     let resp = graph::connections::get_connections().await.unwrap();
+    let students = file::get_all_names().await;
+    let colours = graph::colour::get_colourings(students).await;
     
-    Json(resp)
+    Json((resp, colours))
 }
 
 #[derive(Deserialize)]

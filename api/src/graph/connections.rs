@@ -67,9 +67,9 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
 
     for s1 in &students {
         counter += 1;
-        println!("{counter}/{total} {a1}", a1 = s1.1);
+        println!("{counter}/{total} {a1}", a1 = s1.name);
 
-        let mut resp = add_shared_classes(s1.1.parse::<u64>().unwrap(), false).await.1;
+        let mut resp = add_shared_classes(s1.id, false).await.1;
         resp.sort_by(|a, b| {
             a.1.cmp(&b.1)  
         });
@@ -84,7 +84,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
             sqlx::query(
                 &format!(
                 "INSERT INTO Connections VALUES ('{a1}-{a2}', '{val}') ON CONFLICT (connection) DO UPDATE SET weight = EXCLUDED.weight;",
-                a1 = s1.1, a2 = s2.0.id, val = s2.1
+                a1 = s1.id, a2 = s2.0.id, val = s2.1
                 )
             )
             .execute(&pool)

@@ -24,16 +24,18 @@ fn check_difference(v1: &Vec<String>, v2: &Vec<String>) -> u64 {
 }
 
 /// takes a list of students, returns a kind of dict pointing to their colours
-pub async fn get_colourings(students: Vec<User>) -> Vec<(User, String)> {
+pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))> {
     let mut out = vec![];
-    let mut colour_map: HashMap<Vec<String>, String> = HashMap::new();
+    let mut colour_map: HashMap<Vec<String>, (i32, i32, i32)> = HashMap::new();
     let mut v_space: HashSet<Vec<String>> = HashSet::new();
+    let mut student_map: HashMap<User, Vec<String>> = HashMap::new();
 
     let mut adj_list: HashMap<Vec<String>, Vec<Vec<String>>> = HashMap::new();
 
-    for student in students {
+    for student in &students {
         let classes = super::get_classes(student.id).await;
 
+        student_map.insert(student.clone(), classes.clone());
         v_space.insert(classes.clone());
         adj_list.insert(classes.clone(), vec![]);
     }
@@ -59,37 +61,107 @@ pub async fn get_colourings(students: Vec<User>) -> Vec<(User, String)> {
         visited.insert(val.clone(), false);
     }
 
-    let colour_prime = String::from("#ffffff");
+    let colour_prime = (150, 150, 150);
 
     let elem = v_space.iter().next().unwrap().clone();
+    println!("Initial loop...");
     traverse_path(&adj_list, &mut visited, &mut colour_map, elem, colour_prime);
 
+    for set in &v_space {
+        let resp = visited.get(set).unwrap();
+        if !resp {
+            println!("Traversing again...");
+            traverse_path(&adj_list, &mut visited, &mut colour_map, (*set.clone()).to_vec(), colour_prime);
+        }
+    }
 
+    println!("Constructing map...");
+    for student in &students {
+        
+        let classes = student_map.get(student).unwrap();
+        let colour = colour_map.get(classes).unwrap();
+
+        out.push((student.clone(), *colour));
+    }
+    
+    println!("Exitting out...");
+    out
+}
+
+fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mut HashMap<Vec<String>, bool>, colour_map: &mut HashMap<Vec<String>, (i32, i32, i32)>, prime_node: Vec<String>, prime_colour: (i32, i32, i32)) {
+    let mut deq: VecDeque<Vec<String>> = VecDeque::new();
+    deq.push_back(prime_node.clone());
+
+    colour_map.insert(prime_node, prime_colour);
+
+    while deq.len() > 0 {
+        let current = deq.pop_front().unwrap();
+        println!("LOADING.. {c}", c = current[0]);
+        let e = visited.entry(current.clone()).or_insert(true);
+        *e = true;
+
+        let entry = adj_list.get(&current).unwrap();
+
+        println!("Inner loop...");
+        let mut i = 0; 
+        for connection in entry {
+            i += 1;
+            
+            match visited.get(connection) {
+                Some(b) => {
+                    if !*b {
+                        deq.push_back((*connection.clone()).to_vec());
+                        let current_colour = colour_map.get(&current).unwrap();
+                        colour_map.insert((*connection.clone()).to_vec(), update_colour(*current_colour, i));
+                    }
+                },
+                None => println!("ERROR"),
+            } 
+        }
+        
+
+    }
+}
+
+fn update_colour(og: (i32, i32, i32), index: u64) -> (i32, i32, i32) {
+    let delta = 20;
+    let mut out = og;
+    
+    if get_bit_at(index, 0) {
+        if get_bit_at(index, 3) {
+            out.0 = cmp::min(og.0 - delta, 0);
+        }
+        else {
+            out.0 = cmp::max(og.0 + delta, 255);
+        }
+    }
+
+    if get_bit_at(index, 1) {
+        if get_bit_at(index, 4) {
+            out.1 = cmp::min(og.1 - delta, 0);
+        }
+        else {
+            out.1 = cmp::max(og.1 + delta, 255);
+        }
+    }
+
+    if get_bit_at(index, 2) {
+        if get_bit_at(index, 5) {
+            out.2 = cmp::min(og.2 - delta, 0);
+        }
+        else {
+            out.2 = cmp::max(og.2 + delta, 255);
+        }
+    }
     
     out
 }
 
-fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mut HashMap<Vec<String>, bool>, colour_map: &mut HashMap<Vec<String>, String>, prime_node: Vec<String>, prime_colour: String) {
-    let mut deq: VecDeque<Vec<String>> = VecDeque::new();
-    deq.push_back(prime_node);
-
-    while deq.len() > 0 {
-        let current = deq.pop_front().unwrap();
-        let e = visited.entry(current.clone()).or_insert(true);
-        *e = true;
-
-        while let Some(entry) = adj_list.get(&current) {
-            for connection in entry {
-                match visited.get(connection) {
-                    Some(b) => {
-                        if !*b {
-                            deq.push_back((*connection.clone()).to_vec());
-                        }
-                    },
-                    None => println!("ERROR"),
-                } 
-            }
-        }
-
+/// gets the bit at position `n`. Bits are numbered from 0 (least significant) to 31 (most significant).
+fn get_bit_at(input: u64, n: u8) -> bool {
+    if n < 32 {
+        input & (1 << n) != 0
+    } else {
+        false
     }
 }
