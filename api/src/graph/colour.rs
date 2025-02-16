@@ -34,7 +34,11 @@ pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))>
     let mut adj_list: HashMap<Vec<String>, Vec<Vec<String>>> = HashMap::new();
 
     for student in &students {
-        let classes = super::get_classes(student.id).await;
+        let classes: Vec<String> = super::get_classes(student.id)
+            .await.into_iter()
+                .filter(
+                    |x| x.chars().last().unwrap() != '5'
+                ).collect();
 
         student_map.insert(student.clone(), classes.clone());
         v_space.insert(classes.clone());
@@ -129,7 +133,7 @@ fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mu
 }
 
 fn update_colour(og: (i32, i32, i32), index: u64) -> (i32, i32, i32) {
-    let delta = 60;
+    let delta = 15;
     let mut out = og;
     let num = rand::rng().random_range(0..100);
     //println!("Index is {index}");
