@@ -8,6 +8,7 @@ use serde::Deserialize;
 use structs::User;
 use tower_http::cors::{Any, CorsLayer}; 
 use http::Method;
+use std::env;
 
 mod file;
 mod counter;
@@ -31,8 +32,14 @@ struct Params {
     uuid: u64
 }
 
-async fn get_timetable_data(Path(Params { uuid }): Path<Params>) -> Json<(Vec<(String, u64)>, Vec<(User, u64)>)> {
-    let data = counter::add_shared_classes(uuid, true).await;
+#[derive(Deserialize)]
+struct TrackingParams {
+    uuid: u64,
+    key: String
+}
+
+async fn get_timetable_data(Path(TrackingParams { uuid, key }): Path<TrackingParams>) -> Json<(Vec<(String, u64)>, Vec<(User, u64)>)> {
+    let data = counter::add_shared_classes(uuid, true, key).await;
     
     Json(data)
 }
@@ -137,7 +144,7 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
     let router = Router::new()
         .route("/", get(hello_world))
         .route("/get_all_names", get(get_all_names))
-        .route("/get_data/{uuid}", get(get_timetable_data))
+        .route("/get_data/{uuid}/{key}", get(get_timetable_data))
         .route("/prefix/{search}", get(prefix_search))
         .route("/countdowns", get(countdowns))
         .route("/get_connections", get(get_connections))
@@ -145,19 +152,11 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/get_classes/{uuid}", get(get_classes))
         .layer(cors);
 
-    //max_connections().await;
-	
-<<<<<<< Updated upstream
-	match graph::connections::init_database().await {
-		Ok(_e) => println!("Successfully initted"),
-		Err(v) => println!("{v}")
-	};
-=======
+    //max_connection
 //	match connections::init_database().await {
 //		Ok(_e) => println!("Successfully initted"),
 //		Err(v) => println!("{v}")
 //	};
->>>>>>> Stashed changes
 
     counter::get_classes(9668).await;
 
