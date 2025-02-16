@@ -128,7 +128,7 @@ fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mu
 
                         deq.push_back((*connection.clone()).to_vec());
                         let current_colour = colour_map.get(&current).unwrap();
-                        colour_map.insert((*connection.clone()).to_vec(), update_colour(*current_colour, i));
+                        colour_map.insert((*connection.clone()).to_vec(), update_colour(*current_colour));
                     }
                 },
                 None => println!("ERROR"),
@@ -139,27 +139,22 @@ fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mu
     }
 }
 
-fn update_colour(og: (i32, i32, i32), index: u64) -> (i32, i32, i32) {
-    let delta = 40;
+fn update_colour(og: (i32, i32, i32)) -> (i32, i32, i32) {
+    let delta = 50;
     let mut out = og;
-    let num = rand::rng().random_range(0..100);
-    //println!("Index is {index}");
+    let num = rand::rng().random_range(0..3);
+    //println!("Index is {num}");
     
-    if get_bit_at(num, 0) {
-    
-            out.0 = cmp::min(og.0 + delta, 255);
-        
+    if num==0 {
+        out.0 = cmp::min(og.0 + delta, 220);
     }
 
-    if get_bit_at( num, 1) {
-   
-        out.1 = cmp::min(og.1 + delta, 255);
-    
+    if num==1 {
+        out.1 = cmp::min(og.1 + delta, 220);
     }
 
-    if get_bit_at(num, 2) {
-        out.2 = cmp::min(og.2 + delta, 255);
-        
+    if num==2 {
+        out.2 = cmp::min(og.2 + delta, 220);
     }
     
     out
