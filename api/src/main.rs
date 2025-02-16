@@ -147,10 +147,17 @@ pub async fn main() -> shuttle_axum::ShuttleAxum {
 
     //max_connections().await;
 	
+<<<<<<< Updated upstream
 	match graph::connections::init_database().await {
 		Ok(_e) => println!("Successfully initted"),
 		Err(v) => println!("{v}")
 	};
+=======
+//	match connections::init_database().await {
+//		Ok(_e) => println!("Successfully initted"),
+//		Err(v) => println!("{v}")
+//	};
+>>>>>>> Stashed changes
 
     counter::get_classes(9668).await;
 
