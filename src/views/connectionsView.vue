@@ -28,8 +28,9 @@ const data = ref<GraphData>({ nodes: [], links: [] })
 const error = ref<string>('')
 const simulation = ref<any>(null)
 const width = ref<number>(800)
-const height = ref<number>(600)
+const height = ref<number>(1000)
 
+const colourmap = new Map<string, string>()
 const idmap = new Map<string | number, string>()
 const connectionsData = ref<[number, number, number][]>([])
 
@@ -47,13 +48,14 @@ const fetchNames = async () => {
     const data = await response.json()
 
     for (let i = 0; i < data.length; i++) {
-      idmap.set(data[i][1], data[i][0])
+      // console.log(data[i])
+      idmap.set(data[i].id, data[i].name)
       nodes.value.push({
-        id: data[i][1],
-        name: data[i][0],
+        id: data[i].id,
+        name: data[i].name,
       })
     }
-    console.log("Names fetched!", nodes.value)
+    //console.log("Names fetched!", nodes.value)
   } catch (e) {
     error.value = 'Failed to load names. Please try again later.'
     console.error('Error fetching names:', e)
@@ -85,16 +87,16 @@ const drag = (simulation: any) => {
 }
 
 const initGraph = () => {
-  console.log('Initiating data...')
+  //console.log('Initiating data...')
   
-  const validNodeIds = new Set(nodes.value.map(node => node.id))
+  const validNodeIds = new Set(nodes.value.map(node => node.id.toString()))
   
   const min = 0
 
   const links = connectionsData.value
   .filter(conn => {
-    const sourceExists = validNodeIds.has(conn[0]);
-    const targetExists = validNodeIds.has(conn[1]);
+    const sourceExists = validNodeIds.has(conn[0].toString());
+    const targetExists = validNodeIds.has(conn[1].toString());
 
     if (!sourceExists) {
       console.warn(`Source node ${conn[0]} not found`);
@@ -106,8 +108,8 @@ const initGraph = () => {
     return sourceExists && targetExists && conn[2] > min;
   })
   .map(conn => {
-    const sourceNode = nodes.value.find(node => node.id === conn[0]);
-    const targetNode = nodes.value.find(node => node.id === conn[1]);
+    const sourceNode = nodes.value.find(node => node.id.toString() === conn[0].toString());
+    const targetNode = nodes.value.find(node => node.id.toString() === conn[1].toString());
 
     if (!sourceNode || !targetNode) {
       console.warn('Invalid source or target node:', conn);
@@ -123,7 +125,7 @@ const initGraph = () => {
   })
   .filter(link => link !== null) as Link[]; 
 
-  console.log('Valid links created:', links)
+  //console.log('Valid links created:', links)
 
   data.value = { 
     nodes: nodes.value, 
@@ -163,7 +165,7 @@ const initGraph = () => {
 
   node.append('circle')
     .attr('r', 8)
-    .attr('fill', '#69b3a2')
+    .attr('fill', d => colourmap.get(d.id as string) || '#69b3a2')
 
   node.append('text')
     .text(d => d.name)
@@ -174,10 +176,10 @@ const initGraph = () => {
 
   if (nodes.value.length > 0) {
       simulation.value = d3.forceSimulation(data.value.nodes)
-        .force('link', d3.forceLink(data.value.links).strength((link: any) => link.strength / 60)
+        .force('link', d3.forceLink(data.value.links).strength((link: any) => link.strength / 30)
           .id((d: any) => d.id)
           .distance(60))
-      .force('charge', d3.forceManyBody().strength(-600))
+      .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width.value / 2, height.value / 2))
       .on('tick', () => {
         link
@@ -198,9 +200,23 @@ const fetchConnections = async () => {
     const response = await fetch(`${API_BASE_URL}/get_connections`)
     const rawData = await response.json()
 
-    rawData.forEach((d: [[number, number], number]) => {
+    rawData[0].forEach((d: [[number, number], number]) => {
+      console.log([d[0][0], d[0][1], d[1] / 10]);
       connectionsData.value.push([d[0][0], d[0][1], d[1] / 10])
     });
+
+    rawData[1].forEach((d : [{id: string, name: string}, [number, number, number]]) => {
+      const hexR = d[1][0].toString(16).padStart(2, '0');
+      const hexG = d[1][1].toString(16).padStart(2, '0');
+      const hexB = d[1][2].toString(16).padStart(2, '0');
+      const fullHex = `#${hexR}${hexG}${hexB}`;
+
+      console.log(d[1], fullHex);
+      
+      colourmap.set(d[0].id, fullHex);
+    })
+
+    //console.log(connectionsData.value);
 
     initGraph()
   } catch (e) {
@@ -239,7 +255,6 @@ onUnmounted(() => {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
   overflow: hidden;
 }
 

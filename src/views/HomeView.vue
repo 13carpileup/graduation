@@ -6,7 +6,7 @@ import { API_BASE_URL } from '@/constants'
 
 const searchQuery = ref('')
 const selectedId = ref('')
-const searchResults = ref<[string, string][]>([])
+const searchResults = ref<{id: string, name: string}[]>([])
 const classData = ref([])
 const errorMessage = ref('')
 const isLoading = ref(false)
@@ -103,13 +103,13 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
           <!-- Search Suggestions -->
           <div v-if="showSuggestions && searchResults.length > 0" class="search-suggestions">
             <div
-              v-for="[name, id] in searchResults"
-              :key="id"
+              v-for="student in searchResults"
+              :key="student.id"
               class="suggestion-item"
-              @click="selectStudent(name, id)"
+              @click="selectStudent(student.name, student.id)"
             >
-              <span class="suggestion-name">{{ name }}</span>
-              <span class="suggestion-id">ID: {{ id }}</span>
+              <span class="suggestion-name">{{ student.name }}</span>
+              <span class="suggestion-id">ID: {{ student.id }}</span>
             </div>
           </div>
         </div>

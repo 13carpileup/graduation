@@ -5,6 +5,7 @@ use crate::structs::User;
 
 use std::cmp;
 use std::collections::{ HashMap, HashSet, VecDeque };
+use rand::Rng; 
 
 /// checks the number of differences between class lists
 fn check_difference(v1: &Vec<String>, v2: &Vec<String>) -> u64 {
@@ -61,11 +62,11 @@ pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))>
         visited.insert(val.clone(), false);
     }
 
-    let colour_prime = (150, 150, 150);
+    let colour_prime = (40, 40, 40);
 
     let elem = v_space.iter().next().unwrap().clone();
-    println!("Initial loop...");
-    traverse_path(&adj_list, &mut visited, &mut colour_map, elem, colour_prime);
+    //println!("Initial loop...");
+    traverse_path(&adj_list, &mut visited, &mut colour_map, elem.clone(), colour_prime);
 
     for set in &v_space {
         let resp = visited.get(set).unwrap();
@@ -75,16 +76,20 @@ pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))>
         }
     }
 
-    println!("Constructing map...");
+    //println!("Constructing map...");
     for student in &students {
         
         let classes = student_map.get(student).unwrap();
         let colour = colour_map.get(classes).unwrap();
 
+        if elem == *classes {
+            println!("{name}", name = student.name);
+        }
+
         out.push((student.clone(), *colour));
     }
     
-    println!("Exitting out...");
+    //println!("Exitting out...");
     out
 }
 
@@ -96,20 +101,20 @@ fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mu
 
     while deq.len() > 0 {
         let current = deq.pop_front().unwrap();
-        println!("LOADING.. {c}", c = current[0]);
+        //println!("LOADING.. {c}", c = current[0]);
         let e = visited.entry(current.clone()).or_insert(true);
         *e = true;
 
         let entry = adj_list.get(&current).unwrap();
 
-        println!("Inner loop...");
+        //println!("Inner loop...");
         let mut i = 0; 
-        for connection in entry {
-            i += 1;
-            
+        for connection in entry {            
             match visited.get(connection) {
                 Some(b) => {
                     if !*b {
+                        i += 1;
+
                         deq.push_back((*connection.clone()).to_vec());
                         let current_colour = colour_map.get(&current).unwrap();
                         colour_map.insert((*connection.clone()).to_vec(), update_colour(*current_colour, i));
@@ -124,34 +129,26 @@ fn traverse_path(adj_list: &HashMap<Vec<String>, Vec<Vec<String>>>, visited: &mu
 }
 
 fn update_colour(og: (i32, i32, i32), index: u64) -> (i32, i32, i32) {
-    let delta = 20;
+    let delta = 60;
     let mut out = og;
+    let num = rand::rng().random_range(0..100);
+    //println!("Index is {index}");
     
-    if get_bit_at(index, 0) {
-        if get_bit_at(index, 3) {
-            out.0 = cmp::min(og.0 - delta, 0);
-        }
-        else {
-            out.0 = cmp::max(og.0 + delta, 255);
-        }
+    if get_bit_at(num, 0) {
+    
+            out.0 = cmp::min(og.0 + delta, 255);
+        
     }
 
-    if get_bit_at(index, 1) {
-        if get_bit_at(index, 4) {
-            out.1 = cmp::min(og.1 - delta, 0);
-        }
-        else {
-            out.1 = cmp::max(og.1 + delta, 255);
-        }
+    if get_bit_at( num, 1) {
+   
+        out.1 = cmp::min(og.1 + delta, 255);
+    
     }
 
-    if get_bit_at(index, 2) {
-        if get_bit_at(index, 5) {
-            out.2 = cmp::min(og.2 - delta, 0);
-        }
-        else {
-            out.2 = cmp::max(og.2 + delta, 255);
-        }
+    if get_bit_at(num, 2) {
+        out.2 = cmp::min(og.2 + delta, 255);
+        
     }
     
     out

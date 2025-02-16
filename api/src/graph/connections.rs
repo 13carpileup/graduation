@@ -78,7 +78,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
 
         println!("{fst}", fst = rev[0].1);
 
-        for i in 0..2 {
+        for i in 0..3 {
             let s2 = rev[i];
 
             sqlx::query(
