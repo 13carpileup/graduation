@@ -90,6 +90,7 @@ pub async fn add_shared_classes(uuid: u64, log: bool) -> (Vec<(String, u64)>, Ve
     (processed_data, out)
 }
 
+/// returns vector of classes, sorted alphabetically
 pub async fn get_classes(id: u64) -> Vec<String> {
     let raw_data = super::file::get_timetable(id).await;
     let lines = raw_data.split("\r\n");
@@ -105,7 +106,8 @@ pub async fn get_classes(id: u64) -> Vec<String> {
         }
     }
 
-    let v: Vec<String> = classes.into_iter().collect();
+    let mut v: Vec<String> = classes.into_iter().collect();
+    v.sort();
 
     v
 }
