@@ -47,7 +47,15 @@ const fetchData = async () => {
   showSuggestions.value = false
 
   try {
-    const response = await axios.get(API_BASE_URL + `/get_data/${selectedId.value}`)
+    let key: string | null = ""
+    if (localStorage.getItem("session")) {
+      key = localStorage.getItem("session")
+    }
+    else {
+      key = (Math.random() + 1).toString(36).substring(7);
+      localStorage.setItem("session", key)
+    }
+    const response = await axios.get(API_BASE_URL + `/get_data/${selectedId.value}/${key}`)
     classData.value = response.data[0]
 
     sharedClassesData.value = response.data[1]

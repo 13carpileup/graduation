@@ -69,7 +69,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
         counter += 1;
         println!("{counter}/{total} {a1}", a1 = s1.name);
 
-        let mut resp = add_shared_classes(s1.id, false).await.1;
+        let mut resp = add_shared_classes(s1.id, false, String::from("yuh")).await.1;
         resp.sort_by(|a, b| {
             a.1.cmp(&b.1)  
         });

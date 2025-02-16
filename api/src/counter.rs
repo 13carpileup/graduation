@@ -55,7 +55,7 @@ pub fn process_data(timetable: String) -> Vec<(String, u64)> {
     return out;
 }
 
-pub async fn add_shared_classes(uuid: u64, log: bool) -> (Vec<(String, u64)>, Vec<(User, u64)>) {
+pub async fn add_shared_classes(uuid: u64, log: bool, key: String) -> (Vec<(String, u64)>, Vec<(User, u64)>) {
     let mut out: Vec<(User, u64)> = vec![];
 
     let raw_data = super::file::get_timetable(uuid).await;
@@ -66,7 +66,7 @@ pub async fn add_shared_classes(uuid: u64, log: bool) -> (Vec<(String, u64)>, Ve
         let new_uuid = student.id;
         if new_uuid == uuid {
             if log {
-                let _ = super::log::write_to_file(student.name).await;
+                let _ = super::log::write_to_file(format!("{key} fetched {name}", key = key, name = student.name)).await;
             }
             continue;
         }
