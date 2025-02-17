@@ -100,6 +100,11 @@ const initGraph = () => {
   
   console.log("accessing" + connectionsData.value[0])
 
+  nodes.value.forEach(node => {
+    node.x = (node.id as number) % 33;
+    node.y = (node.id as number) % 33;
+  });
+
   const links = connectionsData.value[dataIndex.value]
   .filter((conn: number[]) => {
     const sourceExists = validNodeIds.has(conn[0].toString());
@@ -149,7 +154,7 @@ const initGraph = () => {
     .attr('class', 'everything')
 
   const zoom = d3.zoom<any, any>()
-    .scaleExtent([0.2, 200])
+    .scaleExtent([0.08, 6])
     .on('zoom', (event) => {
       g.attr('transform', event.transform)
     })
@@ -281,6 +286,10 @@ const setChosen = (index: number) => {
 <template>
 
   <div class="graph-container">
+    <div v-if="connectionsData[0].length === 0" class="loading">
+        Loading countdowns...
+    </div>
+
     <div v-if="error" class="error">{{ error }}</div>
     <svg id="graph"></svg>
   </div>
@@ -289,14 +298,35 @@ const setChosen = (index: number) => {
     <button @click = "setChosen(0)" :class = "'set-view ' + buttonClasses[0]">Shared Classes</button>
     <button @click = "setChosen(1)" :class = "'set-view ' + buttonClasses[1]">Subject Combinations</button>
     <button @click = "setChosen(2)" :class = "'set-view ' + buttonClasses[2]">Mix</button>
+    <h4 class = "guide-text">Scroll to zoom, drag to pan around</h4>
   </div>  
 </template>
 
 <style scoped>
+.guide-text {
+  font-size: 1rem;
+  font-weight: bold;
+  background: linear-gradient(to right, #906bd2, #807be3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 1rem;
+  margin-left: 10rem;
+  font-style: italic;
+  float: right;
+}
+
+.loading {
+  text-align: center;
+  margin: 0 auto;
+  line-height: 200px;
+}
+
 .option-wrapper {
   display:flex;
   flex-direction: row;
   align-items: baseline;
+  flex-wrap: wrap;
 }
 
 .selected {
