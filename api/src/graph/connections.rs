@@ -10,6 +10,8 @@ use sqlx::ValueRef;
 use sqlx::Row;
 use std::collections::HashMap;
 
+use super::helper;
+
 use crate::structs::User;
 use super::get_all_names;
 use super::add_shared_classes;
@@ -95,7 +97,7 @@ pub async fn init_database() -> Result<(), sqlx::Error> {
     Ok(())
 }
 
-pub async fn get_connections() -> Result<Vec<((String, String), u64)>, sqlx::Error> {
+pub async fn get_classes_connections() -> Result<Vec<((String, String), u64)>, sqlx::Error> {
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect("postgres://postgres:postgres@localhost/grad")
@@ -167,4 +169,57 @@ pub async fn update_connection(id1: String, id2: String, delta: i64) -> Result<(
     .await?;
 
     Ok(())
+}
+
+pub async fn get_subjects_connections(students: &Vec<User>) -> Vec<((String, String), u64)> {
+    let mut out: Vec<((String, String), u64)> = vec![];
+    
+    let resp = helper::create_adj_list(students).await;
+
+    let v_space = resp.0;
+    let adj_list = resp.1;
+    let student_map = resp.2;
+
+    let mut reversed_map: HashMap<Vec<String>, Vec<User>> = HashMap::new();
+    for student in students {
+        let classes = student_map.get(student).unwrap();
+        
+        reversed_map.entry(classes.clone()).or_insert(vec![]).push(student.clone());
+    }
+
+    let connection_limit = 2;
+
+    for student in students {
+        let classes = student_map.get(student).unwrap();
+        
+        let mut i = 0; 
+        for connection in reversed_map.get(classes).unwrap() {
+            out.push(((connection.id.to_string(), student.id.to_string()), 100));
+
+            i += 1;
+            if i >= connection_limit {
+                break;
+            }
+        }
+
+        i = 0;
+        for one_away in adj_list.get(classes).unwrap() {
+            let mut j = 0;
+            for connection in reversed_map.get(one_away).unwrap() {
+                out.push(((connection.id.to_string(), student.id.to_string()), 20));
+                
+                j += 1;
+                if j > connection_limit {
+                    break;
+                }
+            }
+
+            i += 1;
+            if i >= connection_limit {
+                break;
+            }
+        }
+    }
+    
+    out
 }

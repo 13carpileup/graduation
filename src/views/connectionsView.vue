@@ -32,7 +32,10 @@ const height = ref<number>(1000)
 
 const colourmap = new Map<string, string>()
 const idmap = new Map<string | number, string>()
-const connectionsData = ref<[number, number, number][]>([])
+const connectionsData = ref<[number, number, number][][]>([[], [], []])
+const buttonClasses = ref<[string, string, string]>(["selected", "unselected", "unselected"])
+const dataIndex = ref<number>(0)
+
 
 const updateDimensions = () => {
   const container = document.querySelector('.graph-container')
@@ -88,13 +91,17 @@ const drag = (simulation: any) => {
 
 const initGraph = () => {
   //console.log('Initiating data...')
+
+
   
   const validNodeIds = new Set(nodes.value.map(node => node.id.toString()))
   
   const min = 0
+  
+  console.log("accessing" + connectionsData.value[0])
 
-  const links = connectionsData.value
-  .filter(conn => {
+  const links = connectionsData.value[dataIndex.value]
+  .filter((conn: number[]) => {
     const sourceExists = validNodeIds.has(conn[0].toString());
     const targetExists = validNodeIds.has(conn[1].toString());
 
@@ -107,7 +114,7 @@ const initGraph = () => {
 
     return sourceExists && targetExists && conn[2] > min;
   })
-  .map(conn => {
+  .map((conn: any[]) => {
     const sourceNode = nodes.value.find(node => node.id.toString() === conn[0].toString());
     const targetNode = nodes.value.find(node => node.id.toString() === conn[1].toString());
 
@@ -123,7 +130,7 @@ const initGraph = () => {
       strength: conn[2]
     };
   })
-  .filter(link => link !== null) as Link[]; 
+  .filter((link: any) => link !== null) as Link[]; 
 
   //console.log('Valid links created:', links)
 
@@ -174,6 +181,8 @@ const initGraph = () => {
     .style('font-size', '12px')
     .style('fill', '#333')
 
+
+
   if (nodes.value.length > 0) {
       simulation.value = d3.forceSimulation(data.value.nodes)
         .force('link', d3.forceLink(data.value.links).strength((link: any) => link.strength / 30)
@@ -192,6 +201,11 @@ const initGraph = () => {
           .attr('transform', d => `translate(${(d as any).x},${(d as any).y})`)
       })
   }
+
+  // nodes.value.forEach(node => {
+  //   node.x = 30;
+  //   node.y = 20;
+  // });
 }
 
 const fetchConnections = async () => {
@@ -199,10 +213,16 @@ const fetchConnections = async () => {
     console.log('Fetching connections...')
     const response = await fetch(`${API_BASE_URL}/get_connections`)
     const rawData = await response.json()
+    console.log(rawData)
 
-    rawData[0].forEach((d: [[number, number], number]) => {
-      console.log([d[0][0], d[0][1], d[1] / 10]);
-      connectionsData.value.push([d[0][0], d[0][1], d[1] / 10])
+    rawData[0][0].forEach((d: [[number, number], number]) => {
+      connectionsData.value[0].push([d[0][0], d[0][1], d[1] / 10])
+      connectionsData.value[2].push([d[0][0], d[0][1], d[1] / 10])
+    });
+
+    rawData[0][1].forEach((d: [[number, number], number]) => {
+      connectionsData.value[1].push([d[0][0], d[0][1], d[1] / 10])
+      connectionsData.value[2].push([d[0][0], d[0][1], d[1] / 10])
     });
 
     rawData[1].forEach((d : [{id: string, name: string}, [number, number, number]]) => {
@@ -238,16 +258,85 @@ onUnmounted(() => {
     simulation.value.stop()
   }
 })
+
+const setChosen = (index: number) => {
+  for (let i = 0; i < buttonClasses.value.length; i++) {
+    buttonClasses.value[i] = "unselected";
+  }
+
+  buttonClasses.value[index] = "selected";
+
+  dataIndex.value = index;
+
+  d3.select('#graph').selectAll('*').remove()
+
+  if (simulation.value) {
+    simulation.value.stop()
+  }
+
+  initGraph();
+}
 </script>
 
 <template>
+
   <div class="graph-container">
     <div v-if="error" class="error">{{ error }}</div>
     <svg id="graph"></svg>
   </div>
+  <div class = "option-wrapper" :key="buttonClasses[0]">
+    <h3 class = "option-text">Sort by:</h3>
+    <button @click = "setChosen(0)" :class = "'set-view ' + buttonClasses[0]">Shared Classes</button>
+    <button @click = "setChosen(1)" :class = "'set-view ' + buttonClasses[1]">Subject Combinations</button>
+    <button @click = "setChosen(2)" :class = "'set-view ' + buttonClasses[2]">Mix</button>
+  </div>  
 </template>
 
 <style scoped>
+.option-wrapper {
+  display:flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+
+.selected {
+  background-color: rgb(219, 219, 255)
+}
+
+.unselected {
+  background-color: rgb(217, 212, 212);
+}
+
+.set-view {
+  transition: background-color; 
+  transition-duration: 300ms;
+  margin: 1rem;
+  min-height: 40px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.option-text {
+  margin-right: 2rem;
+}
+
+.set-view.unselected:hover {
+  background-color: rgb(201, 201, 233);
+}
+
+
+.option-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(to right, #7c3aed, #4f46e5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 1rem;
+  margin-left: 4rem;
+}
 .graph-container {
   margin: 0 auto;
   width: 90%;

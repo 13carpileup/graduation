@@ -4,3 +4,4 @@ pub use super::log::write_to_file;
 
 pub mod connections;
 pub mod colour;
+pub mod helper;

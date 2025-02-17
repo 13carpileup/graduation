@@ -1,33 +1,11 @@
 # graduation
 
-This template should help get you started developing with Vue 3 in Vite.
+A site made for counting down the days and classes left until graduation. Accessible on [graduation.alexclimie.com](graduation.alexclimie.com). Just put in your name, and see which classes you have left, and who you have them with.
 
-## Recommended IDE Setup
+### Data Collection
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+All data collected is public, fetched from Lionel's timetable API. For not-getting-in-trouble reasons, I won't go into too much detail, but if you're interested it's not too difficult to get it yourself.
 
-## Type Support for `.vue` Imports in TS
+### Documentation
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
+The API

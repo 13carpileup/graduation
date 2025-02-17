@@ -1,80 +1,69 @@
 #![allow(unused)]
 
 use super::get_classes;
+use super::helper::create_adj_list;
 use crate::structs::User;
 
 use std::cmp;
 use std::collections::{ HashMap, HashSet, VecDeque };
 use rand::Rng; 
 
-/// checks the number of differences between class lists
-fn check_difference(v1: &Vec<String>, v2: &Vec<String>) -> u64 {
-    let mut matches = 0;
-
-    for c1 in v1 {
-        for c2 in v2 {
-            if c1 == c2 {
-                matches += 1;
-            }
-        }
-    }
-
-    let n = cmp::min(v1.len(), v2.len());
-
-    (n - matches).try_into().unwrap()
-}
-
 /// takes a list of students, returns a kind of dict pointing to their colours
 pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))> {
     let mut out = vec![];
-    let mut colour_map: HashMap<Vec<String>, (i32, i32, i32)> = HashMap::new();
     let mut v_space: HashSet<Vec<String>> = HashSet::new();
     let mut student_map: HashMap<User, Vec<String>> = HashMap::new();
 
     let mut adj_list: HashMap<Vec<String>, Vec<Vec<String>>> = HashMap::new();
 
-    for student in &students {
-        let classes: Vec<String> = super::get_classes(student.id)
-            .await.into_iter()
-                .filter(
-                    |x| x.chars().last().unwrap() != '5'
-                ).collect();
-
-        student_map.insert(student.clone(), classes.clone());
-        v_space.insert(classes.clone());
-        adj_list.insert(classes.clone(), vec![]);
-    }
-
-    for arr1 in &v_space {
-        for arr2 in &v_space {
-            let dif = check_difference(arr1, arr2);
-
-            if dif == 1 {
-                let r1 = adj_list.entry(arr1.to_vec()).or_insert(vec![]);
-                r1.push(arr2.to_vec());
-
-                let r2 = adj_list.entry(arr2.to_vec()).or_insert(vec![]);
-                r2.push(arr1.to_vec());
-            }
-        }
-    }
+    let res = create_adj_list(&students).await;
+    v_space = res.0;
+    adj_list = res.1;
+    student_map = res.2;
 
     // traverse graph
+    let mut working_colour_map: HashMap<Vec<String>, Vec<(i32, i32, i32)>> = HashMap::new();
 
-    let elem = v_space.iter().next().unwrap().clone();
-    let colour_map = returns_colours(&v_space, &adj_list, elem.clone());
+    let repetitions = 3;
 
-    //println!("Constructing map...");
-    for student in &students {
-        
-        let classes = student_map.get(student).unwrap();
-        let colour = colour_map.get(classes).unwrap();
+    let collected_v_space: Vec<Vec<String>> = v_space.clone().into_iter().collect();
+    for i in 0..repetitions {
+        let elem = collected_v_space[i].clone();
 
-        if elem == *classes {
-            println!("{name}", name = student.name);
+        let colour_map = returns_colours(&v_space, &adj_list, elem);
+        for val in &collected_v_space {
+            let ent = working_colour_map.entry(val.to_vec()).or_insert(vec![]);
+            ent.push(*colour_map.get(val).unwrap());
+        }
+    }
+
+    let mut averaged_colour_map: HashMap<Vec<String>, (i32, i32, i32)> = HashMap::new();
+
+    for val in &collected_v_space {
+        let mut colour_total = (0, 0, 0);
+        let colours: &Vec<(i32, i32, i32)> = working_colour_map.get(val).unwrap();
+
+        for colour in colours {
+            colour_total.0 += colour.0;
+            colour_total.1 += colour.1;
+            colour_total.2 += colour.2;
         }
 
+        colour_total.0 = colour_total.0 / repetitions as i32;
+        colour_total.1 = colour_total.1 / repetitions as i32;
+        colour_total.2 = colour_total.2 / repetitions as i32;
+
+        averaged_colour_map.insert(val.clone(), colour_total);
+    }
+
+
+
+    for student in &students {
+        let classes = student_map.get(student).unwrap();
+        let colour = averaged_colour_map.get(classes).unwrap();
+
         out.push((student.clone(), *colour));
+
     }
     
     //println!("Exitting out...");
@@ -89,7 +78,7 @@ fn returns_colours(v_space: &HashSet<Vec<String>>, adj_list: &HashMap<Vec<String
         visited.insert(val.clone(), false);
     }
 
-    let colour_prime = (10, 10, 10);
+    let colour_prime = (0, 0, 0);
 
     traverse_path(&adj_list, &mut visited, &mut colour_map, prime_node.clone(), colour_prime);
 

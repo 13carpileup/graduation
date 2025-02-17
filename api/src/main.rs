@@ -72,12 +72,15 @@ async fn countdowns() -> Json<Vec<(String, String)>> {
     Json(countdowns)
 }
 
-async fn get_connections() -> Json<(Vec<((String, String), u64)>, Vec<(User, (i32, i32, i32))>)> {
-    let resp = graph::connections::get_connections().await.unwrap();
+async fn get_connections() -> Json<(Vec<Vec<((String, String), u64)>>, Vec<(User, (i32, i32, i32))>)> {
     let students = file::get_all_names().await;
+
+    let conn1 = graph::connections::get_classes_connections().await.unwrap();
+    let conn2 = graph::connections::get_subjects_connections(&students).await;
+    
     let colours = graph::colour::get_colourings(students).await;
     
-    Json((resp, colours))
+    Json((vec![conn1, conn2], colours))
 }
 
 #[derive(Deserialize)]
