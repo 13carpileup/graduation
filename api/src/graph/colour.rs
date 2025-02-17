@@ -24,7 +24,7 @@ pub async fn get_colourings(students: Vec<User>) -> Vec<(User, (i32, i32, i32))>
     // traverse graph
     let mut working_colour_map: HashMap<Vec<String>, Vec<(i32, i32, i32)>> = HashMap::new();
 
-    let repetitions = 3;
+    let repetitions = 2;
 
     let collected_v_space: Vec<Vec<String>> = v_space.clone().into_iter().collect();
     for i in 0..repetitions {

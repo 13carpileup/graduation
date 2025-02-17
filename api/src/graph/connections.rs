@@ -187,14 +187,14 @@ pub async fn get_subjects_connections(students: &Vec<User>) -> Vec<((String, Str
         reversed_map.entry(classes.clone()).or_insert(vec![]).push(student.clone());
     }
 
-    let connection_limit = 2;
+    let connection_limit = 3;
 
     for student in students {
         let classes = student_map.get(student).unwrap();
         
         let mut i = 0; 
         for connection in reversed_map.get(classes).unwrap() {
-            out.push(((connection.id.to_string(), student.id.to_string()), 125));
+            out.push(((connection.id.to_string(), student.id.to_string()), 120));
 
             i += 1;
             if i >= connection_limit {

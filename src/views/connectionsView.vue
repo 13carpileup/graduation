@@ -295,9 +295,18 @@ const setChosen = (index: number) => {
   </div>
   <div class = "option-wrapper" :key="buttonClasses[0]">
     <h3 class = "option-text">Sort by:</h3>
-    <button @click = "setChosen(0)" :class = "'set-view ' + buttonClasses[0]">Shared Classes</button>
-    <button @click = "setChosen(1)" :class = "'set-view ' + buttonClasses[1]">Subject Combinations</button>
-    <button @click = "setChosen(2)" :class = "'set-view ' + buttonClasses[2]">Mix</button>
+    <button @click = "setChosen(0)" :class = "'set-view ' + buttonClasses[0]">
+      <p>Shared Classes</p>
+      <p class = "button-desc">Students are connected if they share enough classes</p>
+    </button>
+    <button @click = "setChosen(1)" :class = "'set-view ' + buttonClasses[1]">
+      <p>Subject Combinations</p>
+      <p class = "button-desc">Students are connected if they have similar HLs</p>
+    </button>
+    <button @click = "setChosen(2)" :class = "'set-view ' + buttonClasses[2]">
+      <p>Mix</p>
+      <p class = "button-desc">A bit of both</p>
+    </button>
     <h4 class = "guide-text">Scroll to zoom, drag to pan around</h4>
   </div>  
 </template>
@@ -311,7 +320,7 @@ const setChosen = (index: number) => {
   background-clip: text;
   color: transparent;
   margin-bottom: 1rem;
-  margin-left: 10rem;
+  margin-left: 5rem;
   font-style: italic;
   float: right;
 }
@@ -322,10 +331,15 @@ const setChosen = (index: number) => {
   line-height: 200px;
 }
 
+.button-desc {
+  font-style: italic;
+  font-size: .6rem;
+}
+
 .option-wrapper {
   display:flex;
   flex-direction: row;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -338,13 +352,16 @@ const setChosen = (index: number) => {
 }
 
 .set-view {
+  max-width: 250px;
   transition: background-color; 
   transition-duration: 300ms;
   margin: 1rem;
+  margin-top: 1rem;
   min-height: 40px;
   border: none;
   border-radius: 5px;
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
@@ -364,13 +381,13 @@ const setChosen = (index: number) => {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin-bottom: 1rem;
   margin-left: 4rem;
 }
 .graph-container {
   margin: 0 auto;
+  margin-top: 1rem;
   width: 90%;
-  height: 80vh;
+  height: 75vh;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
