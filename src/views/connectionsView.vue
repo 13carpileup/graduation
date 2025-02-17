@@ -287,7 +287,7 @@ const setChosen = (index: number) => {
 
   <div class="graph-container">
     <div v-if="connectionsData[0].length === 0" class="loading">
-        Loading countdowns...
+        Loading connections...
     </div>
 
     <div v-if="error" class="error">{{ error }}</div>
