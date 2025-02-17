@@ -194,7 +194,7 @@ pub async fn get_subjects_connections(students: &Vec<User>) -> Vec<((String, Str
         
         let mut i = 0; 
         for connection in reversed_map.get(classes).unwrap() {
-            out.push(((connection.id.to_string(), student.id.to_string()), 100));
+            out.push(((connection.id.to_string(), student.id.to_string()), 125));
 
             i += 1;
             if i >= connection_limit {
@@ -206,7 +206,7 @@ pub async fn get_subjects_connections(students: &Vec<User>) -> Vec<((String, Str
         for one_away in adj_list.get(classes).unwrap() {
             let mut j = 0;
             for connection in reversed_map.get(one_away).unwrap() {
-                out.push(((connection.id.to_string(), student.id.to_string()), 20));
+                out.push(((connection.id.to_string(), student.id.to_string()), 25));
                 
                 j += 1;
                 if j > connection_limit {
