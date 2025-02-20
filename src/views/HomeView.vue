@@ -186,7 +186,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
       <!-- No Data State -->
       <div v-else-if="!isLoading && classData.length === 0 && !errorMessage" class="empty-state">
         <GraduationCapIcon class="empty-icon" />
-        <p class="empty-text">Enter your Student ID to view your graduation progress</p>
+        <p class="empty-text">Enter your name to view your graduation progress</p>
       </div>
     </div>
   </main>
