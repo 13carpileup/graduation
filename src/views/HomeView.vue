@@ -187,12 +187,17 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
       <div v-else-if="!isLoading && classData.length === 0 && !errorMessage" class="empty-state">
         <GraduationCapIcon class="empty-icon" />
         <p class="empty-text">Enter your name to view your graduation progress</p>
+        <p class = "kevingong">Kwcin Gong was here</p>
       </div>
     </div>
   </main>
 </template>
 
 <style scoped>
+.kevingong {
+  color: rgb(254, 254, 254);
+}
+
 .main-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
