@@ -99,6 +99,8 @@ pub async fn get_classes(id: u64) -> Vec<String> {
     for line in lines {
         if line.starts_with("SUMMARY:") {
             let class_code = &line.split(':').collect::<Vec<&str>>()[1][2..5];
+            let subject_code = &class_code[0..2];
+            println!("{subject_code} {class_code}")
 
             classes.insert(class_code.to_string());
 
