@@ -31,6 +31,12 @@ pub fn process_data(timetable: String) -> Vec<(String, u64)> {
             let class_code = line.split(':').collect::<Vec<&str>>()[1];
             current_class = class_code;
 
+            let subject_code = &class_code[2..4];
+            if subject_code == "PE" || subject_code == "TP" {
+                current_class = "Skip";
+                continue;
+            }
+
             if !counter.contains_key(current_class) {
                 counter.insert(current_class.to_string(), 0);
             }
@@ -39,7 +45,7 @@ pub fn process_data(timetable: String) -> Vec<(String, u64)> {
         if line.starts_with("DTSTART") {
             let uuid = line.split(':').collect::<Vec<&str>>()[1];
 
-            if check_date(uuid) {
+            if check_date(uuid) && current_class != "Skip" {
                 let entry = counter.entry(current_class.to_string()).or_insert(0);
                 *entry += 1;
             }
@@ -100,7 +106,6 @@ pub async fn get_classes(id: u64) -> Vec<String> {
         if line.starts_with("SUMMARY:") {
             let class_code = &line.split(':').collect::<Vec<&str>>()[1][2..5];
             let subject_code = &class_code[0..2];
-            println!("{subject_code} {class_code}")
 
             classes.insert(class_code.to_string());
 
