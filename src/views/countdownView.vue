@@ -40,6 +40,16 @@ const updateCountdowns = () => {
     ...countdown,
     remaining: calculateTimeRemaining(countdown.date)
   }))
+
+  countdowns.value = countdowns.value.filter(countdown => 
+    countdown.remaining.seconds > 0 ||
+    countdown.remaining.minutes > 0 ||
+    countdown.remaining.hours > 0 ||
+    countdown.remaining.days > 0
+  )
+
+  console.log("filtered!")
+  console.log(countdowns.value)
 }
 
 const fetchCountdowns = async () => {
@@ -54,6 +64,7 @@ const fetchCountdowns = async () => {
     }))
     
     if (countdowns.value.length > 0 && !intervalId) {
+      updateCountdowns();
       intervalId = setInterval(updateCountdowns, 1000)
     }
   } catch (e) {
