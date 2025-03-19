@@ -150,6 +150,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
             v-for="(item, index) in classData"
             :key="index"
             class="class-card"
+            :style="'background: linear-gradient(to right, #f9f9f9 ' + item[1] * 10 +'% ,#f9f9f9 25%, #f9f9f9 25%,white 25%,white 100%)'"
           >
             <div class="class-header">
               <div class="class-info">
@@ -391,7 +392,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
 }
 
 .class-card {
-  background: rgba(255, 255, 255, 0.8);
+  
   backdrop-filter: blur(10px);
   border-radius: 0.75rem;
   padding: 1.5rem;
