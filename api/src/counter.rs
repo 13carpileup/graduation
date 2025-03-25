@@ -1,22 +1,29 @@
 use std::collections::{HashMap, HashSet};
-use chrono::{NaiveDate, Utc};
+use chrono::{NaiveDate, NaiveDateTime, Utc};
 
 use crate::structs::User;
 
+fn construct_date(day: u32, minutes: u32, hours: u32, month: u32) -> NaiveDateTime {
+    let year = 2025;
+    let naive_date = NaiveDate::from_ymd_opt(year, month, day).unwrap();
+    let naive_date_time = naive_date.and_hms_opt(hours, minutes, 0).unwrap();
+
+    naive_date_time
+}
+
 fn check_date(uuid: &str) -> bool {
+    
     let day = uuid[6..8].to_string().parse::<u32>().unwrap(); 
     let month = uuid[4..6].to_string().parse::<u32>().unwrap(); 
     let hours = uuid[10..11].to_string().parse::<u32>().unwrap();
     let minutes = uuid[11..13].to_string().parse::<u32>().unwrap();
 
-    let year = 2025;
-    let naive_date = NaiveDate::from_ymd_opt(year, month, day).unwrap();
-    
-    let naive_date_time = naive_date.and_hms_opt(hours, minutes, 0).unwrap();
+    let naive_date_time = construct_date(day, minutes, hours, month);
+    let max_time = construct_date(3, 0, 0, 4);
 
     let current_utc_time = Utc::now().naive_utc();
 
-    current_utc_time < naive_date_time
+    current_utc_time < naive_date_time && max_time > naive_date_time
 }
 
 pub fn process_data(timetable: String) -> Vec<(String, u64)> {
