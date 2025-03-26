@@ -160,7 +160,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
             
             <div class="progress-container">
               <span :class="['remaining-number', getProgressColor(item[1])]">
-                {{ item[1] }} classes left
+                {{ item[1] }} <span v-if="item[1]!='1'">classes</span><span v-else>class</span> left
               </span>
             </div>
           </div>
