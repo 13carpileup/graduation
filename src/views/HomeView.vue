@@ -93,6 +93,7 @@ if (localStorage.getItem("selected") && localStorage.getItem("name")) {
       <!-- Header Section -->
       <div class="header">
         <h1 class="title">How much time is left?</h1>
+        <p class="classes-label">As no more classes are left, names have now anonymized</p>
       </div>
 
       <!-- Search Section -->
